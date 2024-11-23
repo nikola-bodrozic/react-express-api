@@ -2,15 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
-const morganBody = require('morgan-body');
+// const morganBody = require('morgan-body');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 
 dotenv.config();
 
-const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access-node.log'), { flags: 'a' });
+// const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access-node.log'), { flags: 'a' });
 const app = express();
 
 app.use(bodyParser.json());
@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 // morganBody(app, { stream: accessLogStream, noColors: true, logAllReqHeader: true, logAllResHeader: true });
 // or
-morganBody(app, { stream: accessLogStream, noColors: true });
+// morganBody(app, { stream: accessLogStream, noColors: true });
 
 app.use(cors({
     origin: 'http://localhost:3000',
@@ -45,7 +45,7 @@ app.post('/login', (req, res) => {
         refreshTokens.push(refreshToken);
         res.cookie('accessToken', accessToken, { httpOnly: true })
         res.cookie('refreshToken', refreshToken, { httpOnly: true })
-        return res.status(200).json({ msg: "user is loggedin" });
+        return res.status(200).send("korisnik je ulogovan");
     }
     res.status(403).json({ msg: "Bad username or password" });
 });

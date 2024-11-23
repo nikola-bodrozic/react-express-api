@@ -41,9 +41,8 @@ function App() {
   return (
     <div className="App">
       <div className="App-border">
-        <button onClick={login}>login</button> <hr />
-        {JSON.stringify(status)} <button onClick={getProtectedData}>Get Protected Data</button>
-        {message && <p>{message}</p>}<hr />
+        <button onClick={login}>login</button> {JSON.stringify(status)}  <hr />
+        {message && <p>{message}</p>} <button onClick={getProtectedData}>Get Protected Data</button><hr />
         <button onClick={logout}>logout</button>
       </div>
     </div>

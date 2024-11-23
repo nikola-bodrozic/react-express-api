@@ -20,15 +20,9 @@ ACCESS_TOKEN_SECRET=
 REFRESH_TOKEN_SECRET=
 ```
 
-
-
 ### Local environment
 
-install dependancies in root folder, server/ and react/ folders then in root folder
-
-```
-npm start
-```
+install dependancies in root `server/` and `react/` and use `npm start` in those folder to run apps
 
 ### Docker
 

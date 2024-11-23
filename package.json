@@ -1,8 +1,0 @@
-{
-  "scripts": {
-    "start": "concurrently \"cd server && npm start\"  \"cd react && npm start\""
-  },
-  "dependencies": {
-    "concurrently": "^9.1.0"
-  }
-}
