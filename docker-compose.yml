@@ -1,0 +1,21 @@
+version: '3'
+services:
+  server:
+    build: ./server
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+
+  react:
+    build: ./react
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./react:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
