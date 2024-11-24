@@ -36,16 +36,16 @@ function authenticateToken(req, res, next) {
 }
 
 app.post('/login', (req, res) => {
-    const username = req.body.username;
+    const { username, password } = req.body
     const user = { name: username };
     // todo compare username and password from database
-    if (username === "mike") {
+    if (username === "mike" && password === "123") {
         const accessToken = generateAccessToken(user);
         const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "30min" });
         refreshTokens.push(refreshToken);
         res.cookie('accessToken', accessToken, { httpOnly: true })
         res.cookie('refreshToken', refreshToken, { httpOnly: true })
-        return res.status(200).send("korisnik je ulogovan");
+        return res.status(200).send("user is loggedin");
     }
     res.status(403).json({ msg: "Bad username or password" });
 });
@@ -65,7 +65,6 @@ app.delete('/logout', (req, res) => {
     refreshTokens = refreshTokens.filter(token => token !== req.cookies.refreshToken);
     res.cookie('refreshToken', "", { httpOnly: true, expires: new Date(0) })
     res.cookie('accessToken', "", { httpOnly: true, expires: new Date(0) })
-
     res.send('HTTP-only tokens has been removed!');
 });
 
