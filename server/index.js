@@ -25,7 +25,8 @@ app.use(cors({
     credentials: true
 }));
 
-let refreshTokens = [];
+const refreshTokens = [];
+const port = 4000;
 
 function authenticateToken(req, res, next) {
     jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -83,6 +84,6 @@ function generateAccessToken(user) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
 }
 
-app.listen(4000, () => {
-    console.log('Authentication service started on port 4000');
+app.listen(port, () => {
+    console.log('Authentication service started on port '+port);
 });

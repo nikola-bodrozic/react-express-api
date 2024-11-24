@@ -24,7 +24,7 @@
     "react-dom": "^17.0.0 || ^18.0.0"
   },
   "scripts": {
-    "start": "REACT_APP_NODE_IP=localhost:4000 react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
