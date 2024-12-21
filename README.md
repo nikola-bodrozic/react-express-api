@@ -27,8 +27,15 @@ docker compose up
 ### Deployment on Kubernetes
 
 ```sh
-kubectl apply -f k8s/server
+# in server folder
+docker build -t <YOUR-DOCKER-HUB-USERNAME>/server .
+docker push <YOUR-DOCKER-HUB-USERNAME>/server:latest
 
+# in react folder
+docker build -t <YOUR-DOCKER-HUB-USERNAME>/react .
+docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
+
+kubectl apply -f k8s/server
 kubectl apply -f k8s/react
 ```
 
@@ -36,6 +43,5 @@ clean up
 
 ```sh
 kubectl delete deployment server react
-
 kubectl delete services server-load-balancer react-load-balancer
 ```

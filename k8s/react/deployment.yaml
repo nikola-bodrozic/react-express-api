@@ -13,7 +13,7 @@ spec:
         app: react
     spec:
       containers:
-        - name: server
-          image: 'nikolabod/jwt-and-http-only-react'
+        - name: react
+          image: 'nikolabod/react'
           ports:
             - containerPort: 3000

@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: server
-          image: 'nikolabod/jwt-and-http-only-server'
+          image: 'nikolabod/server'
           ports:
             - containerPort: 4000
