@@ -30,13 +30,19 @@ docker compose up
 ### Deployment on Kubernetes
 
 ```sh
-kubectl apply -f server/deployment.yaml
-kubectl apply -f server/service.yaml
+kubectl apply -f k8s/server/deployment.yaml
+kubectl apply -f k8s/server/service.yaml
+
+kubectl apply -f k8s/react/deployment.yaml
+kubectl apply -f k8s/react/service.yaml
 ```
 
 clean up
 
 ```sh
 kubectl delete deployment server 
-kubectl delete services load-balancer
+kubectl delete services server-load-balancer
+
+kubectl delete deployment react
+kubectl delete services react-load-balancer
 ```

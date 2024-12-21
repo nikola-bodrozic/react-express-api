@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: load-balancer
+  name: react-load-balancer
   labels:
-    app: server
+    app: react
 spec:
   type: LoadBalancer
   ports:
-    - port: 4000
-      targetPort: 4000
+    - port: 3000
+      targetPort: 3000
   selector:
-    app: server
+    app: react
