@@ -15,5 +15,12 @@ spec:
       containers:
         - name: server
           image: 'nikolabod/server'
+          resources: 
+            requests: 
+              memory: "64Mi" 
+              cpu: "250m" 
+            limits: 
+              memory: "128Mi" 
+              cpu: "250m"
           ports:
             - containerPort: 4000

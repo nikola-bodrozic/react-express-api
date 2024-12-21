@@ -15,5 +15,12 @@ spec:
       containers:
         - name: react
           image: 'nikolabod/react'
+          resources: 
+            requests: 
+              memory: "64Mi" 
+              cpu: "250m" 
+            limits: 
+              memory: "128Mi" 
+              cpu: "250m"
           ports:
             - containerPort: 3000
