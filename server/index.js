@@ -63,7 +63,7 @@ app.post('/token', (req, res) => {
 });
 
 app.delete('/logout', (req, res) => {
-    refreshTokens = refreshTokens.filter(token => token !== req.cookies.refreshToken);
+    const refreshTokens = refreshTokens.filter(token => token !== req.cookies.refreshToken);
     res.cookie('refreshToken', "", { httpOnly: true, expires: new Date(0) })
     res.cookie('accessToken', "", { httpOnly: true, expires: new Date(0) })
     res.send('HTTP-only tokens has been removed!');
@@ -74,7 +74,7 @@ app.get('/protected', authenticateToken, (req, res) => {
 });
 
 app.get('/clear', (req, res) => {
-    refreshTokens = []
+    const refreshTokens = []
     res.cookie('refreshToken', "", { httpOnly: true, expires: new Date(0) })
     res.cookie('accessToken', "", { httpOnly: true, expires: new Date(0) })
     res.json({ message: "refresh token array is empty " + JSON.stringify(refreshTokens) });
