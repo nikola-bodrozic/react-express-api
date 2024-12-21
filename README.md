@@ -26,3 +26,17 @@ in root folder:
 ```sh
 docker compose up
 ```
+
+### Deployment on Kubernetes
+
+```sh
+kubectl apply -f server/deployment.yaml
+kubectl apply -f server/service.yaml
+```
+
+clean up
+
+```sh
+kubectl delete deployment server 
+kubectl delete services load-balancer
+```
