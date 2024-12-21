@@ -1,18 +1,15 @@
 # Full Stack
 
-Express server & React TypeScript on Docker and on local dev environment. Repo shows how to use: 
-- JWT acces & refresh tokens 
+Express server & React TypeScript on Docker, on local dev environment and in Kubernetes cluster. Repo shows how to use: 
+- JWT access & refresh tokens 
 - HTTP only cookies
 
 ## Prepare
 
-in `server/` folder create `.env` file  and set values for keys
+in `server/` folder create `.env` file  and set values for ACCESS_TOKEN_SECRET & REFRESH_TOKEN_SECRET
 
-```
+```sh
 cp server/.env.sample server/.env
-cat .env
-ACCESS_TOKEN_SECRET=
-REFRESH_TOKEN_SECRET=
 ```
 
 ### Deployment in Local Environment
