@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 // const fs = require('fs');
 // const path = require('path');
-const constants = require('../constants.js')
+const constants = require('./constants.js')
 
 dotenv.config();
 

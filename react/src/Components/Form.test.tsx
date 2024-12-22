@@ -3,7 +3,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import Form from './Form';
 import { AxiosInstance } from "axios";
 import { axiosClient } from './axiosClient';
-import { LOGIN_MESSAGE } from "../../../constants"
+import { LOGIN_MESSAGE } from "../constants";
 
 jest.mock('./axiosClient');
 const mockedAxiosClient = axiosClient as jest.Mocked<AxiosInstance>;

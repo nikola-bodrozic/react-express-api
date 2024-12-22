@@ -15,7 +15,7 @@ function Form() {
       setStatus(loginMessage);
     } catch (error: any) {
       console.log(error)
-      setStatus(error.message + ": " + error.response.data.msg);
+      setStatus(error.message + ": " + error?.response.data.msg);
       console.error(error);
     }
   }
