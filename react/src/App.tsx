@@ -1,7 +1,6 @@
 import { useState } from "react";
 import "./App.css";
 import { axiosClient } from "./axiosClient";
-import { AxiosError, AxiosInstance } from "axios";
 
 function App() {
   const [status, setStatus] = useState<any>('ini');
@@ -15,7 +14,7 @@ function App() {
       const res = await axiosClient.post("/login", { username, password });
       const loginMessage = res.data;
       setStatus(loginMessage);
-    } catch (error: AxiosError | any) {
+    } catch (error: any) {
       // handle failed POST request based on status and message
       setStatus(error.status + " " + error.response.data.msg);
       console.error(error);
@@ -29,7 +28,7 @@ function App() {
       setMessage(response.data.message);
     } catch (error: any) {
       // todo redirect to login
-      if (error.response.status != 200) setMessage("Log in");
+      if (error.response.status !== 200) setMessage("Log in");
       console.error('Protected route error:', error);
     }
   };

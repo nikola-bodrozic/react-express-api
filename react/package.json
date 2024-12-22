@@ -1,5 +1,5 @@
 {
-  "name": "react2",
+  "name": "react-express-api",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -11,17 +11,16 @@
     "@types/react": "^18.0.5",
     "@types/react-dom": "^18.0.1",
     "axios": "^0.27.1",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "spinners-react": "^1.0.7",
     "typescript": "^4.6.3",
     "web-vitals": "^2.1.4"
   },
-  "peerDependencies": {
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0"
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
   "scripts": {
     "start": "react-scripts start",
