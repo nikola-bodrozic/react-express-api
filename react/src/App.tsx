@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import { axiosClient } from "./axiosClient";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosInstance } from "axios";
 
 function App() {
   const [status, setStatus] = useState<any>('ini');
@@ -47,14 +47,15 @@ function App() {
     <div className="App">
       <div className="App-border">
         <div>
-          <h2>Login</h2>
+          <h2>replace me</h2>
           <form onSubmit={login}>
             <div>
               <label htmlFor="username">Username</label>
               <input
                 type="text"
-                id="username"
+                data-testid="username"
                 value={username}
+                placeholder="Username"
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
@@ -62,15 +63,16 @@ function App() {
               <label htmlFor="password">Password</label>
               <input
                 type="password"
-                id="password"
+                data-testid="password"
                 value={password}
+                placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" name="login">Login</button>
           </form>
         </div>
-        {JSON.stringify(status)}  <hr />
+        {status}  <hr />
         <button onClick={getProtectedData}>Get Protected Data</button> {message} <hr />
         <button onClick={logout}>logout</button>
       </div>
