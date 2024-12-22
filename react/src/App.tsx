@@ -3,7 +3,7 @@ import "./App.css";
 import { axiosClient } from "./axiosClient";
 
 function App() {
-  const [status, setStatus] = useState<any>('ini');
+  const [status, setStatus] = useState('');
   const [message, setMessage] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -12,11 +12,11 @@ function App() {
     e.preventDefault();
     try {
       const res = await axiosClient.post("/login", { username, password });
-      const loginMessage = res.data;
+      const loginMessage = res.data.msg;
       setStatus(loginMessage);
     } catch (error: any) {
-      // handle failed POST request based on status and message
-      setStatus(error.status + " " + error.response.data.msg);
+      console.log(error)
+      setStatus(error.message + ": " + error.response.data.msg);
       console.error(error);
     }
   }
@@ -36,7 +36,7 @@ function App() {
   const logout = async () => {
     try {
       const response = await axiosClient.delete('/logout');
-      setStatus({ msg: response.data })
+      setStatus(response.data.msg )
     } catch (error) {
       console.log('Protected route error:');
     }
@@ -71,7 +71,8 @@ function App() {
             <button type="submit" name="login">Login</button>
           </form>
         </div>
-        {status}  <hr />
+        {status}  
+        <hr />
         <button onClick={getProtectedData}>Get Protected Data</button> {message} <hr />
         <button onClick={logout}>logout</button>
       </div>

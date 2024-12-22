@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 // const fs = require('fs');
 // const path = require('path');
+const constants = require('../constants.js')
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ function authenticateToken(req, res, next) {
 }
 
 app.post('/login', (req, res) => {
+    console.log(constants.LOGIN_MESSAGE)
     const { username, password } = req.body
     const user = { name: username };
     // todo compare username and password from database
@@ -46,7 +48,7 @@ app.post('/login', (req, res) => {
         refreshTokens.push(refreshToken);
         res.cookie('accessToken', accessToken, { httpOnly: true })
         res.cookie('refreshToken', refreshToken, { httpOnly: true })
-        return res.status(200).send("user is loggedin");
+        return res.status(200).json({msg:constants.LOGIN_MESSAGE});
     }
     res.status(403).json({ msg: "Bad username or password" });
 });
@@ -66,7 +68,7 @@ app.delete('/logout', (req, res) => {
     const refreshTokens = refreshTokens.filter(token => token !== req.cookies.refreshToken);
     res.cookie('refreshToken', "", { httpOnly: true, expires: new Date(0) })
     res.cookie('accessToken', "", { httpOnly: true, expires: new Date(0) })
-    res.send('HTTP-only tokens has been removed!');
+    res.json({msg:'HTTP-only tokens has been removed!'});
 });
 
 app.get('/protected', authenticateToken, (req, res) => {
