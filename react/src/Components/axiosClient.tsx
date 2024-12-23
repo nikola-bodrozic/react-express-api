@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-const baseURL = `http://{REACT_APP_NODE_IP}`;
+const baseURL = `http://localhost:4000`;
 
 export const axiosClient: AxiosInstance= axios.create({
 	baseURL,
