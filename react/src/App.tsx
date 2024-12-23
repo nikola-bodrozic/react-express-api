@@ -8,6 +8,8 @@ import NavBar from "./Components/NavBar";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import Dashboard from "./Components/Dashboard";
 import { AuthProvider } from "./AuthContext";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -27,6 +29,7 @@ function App() {
           </Router>
         </AuthProvider>
       </div>
+      <ToastContainer />
     </div>
   );
 }

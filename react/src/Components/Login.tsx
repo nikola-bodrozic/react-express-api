@@ -4,6 +4,7 @@ import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { axiosClient } from "./axiosClient";
 import { AxiosResponse } from 'axios';
+import { toast } from 'react-toastify';
 
 const Login = () => {
     const { login, logout } = useAuth();
@@ -18,9 +19,11 @@ const Login = () => {
             const res: AxiosResponse = await axiosClient.post("/login", { username, password });
             login()
             console.log(res.status, res.statusText)
+            toast.success('Logged in successfully!');
             navigate('/dashboard')
         } catch (error: any) {
             console.log(error)
+            toast.error('Invalid username or password');
             logout()
         }
     };
