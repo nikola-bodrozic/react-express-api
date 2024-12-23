@@ -26,7 +26,6 @@ function Form() {
       const response = await axiosClient.get('/protected');
       setMessage(response.data.message);
     } catch (error: any) {
-      // todo redirect to login
       if (error.response.status !== 200) setMessage("Log in");
       console.error('Protected route error:', error);
     }

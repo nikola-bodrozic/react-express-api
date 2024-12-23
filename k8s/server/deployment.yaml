@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: 'nikolabod/server'
+          image: 'nikolabod/server:latest'
           resources: 
             requests: 
               memory: "512Mi" 
