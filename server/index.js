@@ -40,7 +40,6 @@ function authenticateToken(req, res, next) {
 app.post('/login', (req, res) => {
     const { username, password } = req.body
     const user = { name: username };
-    // todo compare username and password from database
     if (username === "mike" && password === "123") {
         const accessToken = generateAccessToken(user);
         const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "30min" });
@@ -64,7 +63,7 @@ app.post('/token', (req, res) => {
 });
 
 app.delete('/logout', (req, res) => {
-    const refreshTokens = refreshTokens.filter(token => token !== req.cookies.refreshToken);
+    refreshTokens.filter(token => token !== req.cookies.refreshToken);
     res.cookie('refreshToken', "", { httpOnly: true, expires: new Date(0) })
     res.cookie('accessToken', "", { httpOnly: true, expires: new Date(0) })
     res.json({ msg: 'HTTP-only tokens has been removed!' });
