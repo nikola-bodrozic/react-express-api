@@ -15,6 +15,7 @@ spec:
       containers:
         - name: server
           image: 'nikolabod/server:latest'
+          imagePullPolicy: Always
           resources: 
             requests: 
               memory: "512Mi" 
