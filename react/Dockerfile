@@ -2,7 +2,7 @@ FROM node:alpine
 
 WORKDIR /usr/src/app
 
-RUN sudo apk -U upgrade
+RUN apk -U upgrade
 
 COPY package*.json ./
 
