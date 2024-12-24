@@ -1,13 +1,13 @@
-const express = require('express');
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
+const express = require("express");
+const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const bodyParser = require("body-parser");
 // const morganBody = require('morgan-body');
-const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
 // const fs = require('fs');
 // const path = require('path');
-const constants = require('./constants.js')
+const constants = require("./constants.js");
 
 dotenv.config();
 
@@ -21,69 +21,94 @@ app.use(cookieParser());
 // or
 // morganBody(app, { stream: accessLogStream, noColors: true });
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 const refreshTokens = [];
 const port = 4000;
 
 function authenticateToken(req, res, next) {
-    jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
+  jwt.verify(
+    req.cookies.accessToken,
+    process.env.ACCESS_TOKEN_SECRET,
+    (err, user) => {
+      if (err) return res.sendStatus(403);
+      req.user = user;
+      next();
+    }
+  );
 }
 
-app.post('/login', (req, res) => {
-    const { username, password } = req.body
-    const user = { name: username };
-    if (username === "mike" && password === "123") {
-        const accessToken = generateAccessToken(user);
-        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "30min" });
-        refreshTokens.push(refreshToken);
-        res.cookie('accessToken', accessToken, { httpOnly: true })
-        res.cookie('refreshToken', refreshToken, { httpOnly: true })
-        return res.status(200).json({ msg: constants.LOGIN_MESSAGE });
-    }
-    res.status(403).json({ msg: "Bad username or password" });
+function renderTimeStamp(param) {
+  date = new Date();
+  return `${param} probe: ${date.getHours}:${date.getMinutes}:${date.getMilliseconds}`;
+}
+
+app.get("/health", (req, res) => {
+  console.log("Liveness probe checked at", renderTimeStamp("Liveness"));
+  res.status(200).send("OK");
 });
 
-app.post('/token', (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
-    if (refreshToken == null) return res.sendStatus(401);
-    if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        const accessToken = generateAccessToken({ name: user.name });
-        res.cookie('accessToken', accessToken, { httpOnly: true, })
+app.get("/", (req, res) => {
+  console.log("Readiness probe checked at", renderTimeStamp("Readiness"));
+  res.status(200).send("OK");
+});
+
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  const user = { name: username };
+  if (username === "mike" && password === "123") {
+    const accessToken = generateAccessToken(user);
+    const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: "30min",
     });
+    refreshTokens.push(refreshToken);
+    res.cookie("accessToken", accessToken, { httpOnly: true });
+    res.cookie("refreshToken", refreshToken, { httpOnly: true });
+    return res.status(200).json({ msg: constants.LOGIN_MESSAGE });
+  }
+  res.status(403).json({ msg: "Bad username or password" });
 });
 
-app.delete('/logout', (req, res) => {
-    refreshTokens.filter(token => token !== req.cookies.refreshToken);
-    res.cookie('refreshToken', "", { httpOnly: true, expires: new Date(0) })
-    res.cookie('accessToken', "", { httpOnly: true, expires: new Date(0) })
-    res.json({ msg: 'HTTP-only tokens has been removed!' });
+app.post("/token", (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (refreshToken == null) return res.sendStatus(401);
+  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    const accessToken = generateAccessToken({ name: user.name });
+    res.cookie("accessToken", accessToken, { httpOnly: true });
+  });
 });
 
-app.get('/protected', authenticateToken, (req, res) => {
-    res.json({ message: 'This is a protected route', user: req.user });
+app.delete("/logout", (req, res) => {
+  refreshTokens.filter((token) => token !== req.cookies.refreshToken);
+  res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
+  res.cookie("accessToken", "", { httpOnly: true, expires: new Date(0) });
+  res.json({ msg: "HTTP-only tokens has been removed!" });
 });
 
-app.get('/clear', (req, res) => {
-    const refreshTokens = []
-    res.cookie('refreshToken', "", { httpOnly: true, expires: new Date(0) })
-    res.cookie('accessToken', "", { httpOnly: true, expires: new Date(0) })
-    res.json({ message: "refresh token array is empty " + JSON.stringify(refreshTokens) });
+app.get("/protected", authenticateToken, (req, res) => {
+  res.json({ message: "This is a protected route", user: req.user });
+});
+
+app.get("/clear", (req, res) => {
+  const refreshTokens = [];
+  res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
+  res.cookie("accessToken", "", { httpOnly: true, expires: new Date(0) });
+  res.json({
+    message: "refresh token array is empty " + JSON.stringify(refreshTokens),
+  });
 });
 
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 }
 
 app.listen(port, () => {
-    console.log('Authentication service started on port ' + port);
+  console.log("Authentication service started on port " + port);
 });
