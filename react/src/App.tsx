@@ -1,24 +1,21 @@
-import React from "react";
-import "./App.css";
-// import Form from "./Components/Form";
+import './App.css'
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from "./Components/Login";
-import Home from "./Components/Home";
-import NavBar from "./Components/NavBar";
-import ProtectedRoute from "./Components/ProtectedRoute";
-import Dashboard from "./Components/Dashboard";
+import Login from "./components/Login";
+import Home from "./components/Home";
+import NavBar from "./components/NavBar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./components/Dashboard";
 import { AuthProvider } from "./AuthContext";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
-import Logout from "./Components/Logout";
+import Logout from "./components/Logout";
 
 function App() {
+
   return (
-    <div className="App">
-      {/* <div className="App-border">
-        <Form />
-      </div> */}
-      <div className="App-border">
+    <>
+      <div className="App">
         <AuthProvider>
           <Router>
             <NavBar />
@@ -30,10 +27,10 @@ function App() {
             </Routes>
           </Router>
         </AuthProvider>
-      </div>
+      </div >
       <ToastContainer />
-    </div>
-  );
+    </>
+  )
 }
 
-export default App;
+export default App
