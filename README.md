@@ -42,6 +42,17 @@ kubectl apply -f k8s/react
 clean up
 
 ```sh
+kubectl get svc
+kubectl get deployments
+
+# delete depl. and services
+
 kubectl delete deployment server react
 kubectl delete services server-load-balancer react-load-balancer
+```
+
+second way to start k8s using 
+
+```sh
+kubectl apply -f k8s/bringupk8s.yaml
 ```
