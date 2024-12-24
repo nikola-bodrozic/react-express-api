@@ -28,11 +28,11 @@ docker compose up
 
 ```sh
 # in server folder
-docker build -t <YOUR-DOCKER-HUB-USERNAME>/server .
+docker build -t <YOUR-DOCKER-HUB-USERNAME>/server:latest .
 docker push <YOUR-DOCKER-HUB-USERNAME>/server:latest
 
 # in react folder
-docker build -t <YOUR-DOCKER-HUB-USERNAME>/react .
+docker build -t <YOUR-DOCKER-HUB-USERNAME>/react:latest .
 docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
 
 kubectl apply -f k8s/server
