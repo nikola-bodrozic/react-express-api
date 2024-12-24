@@ -49,12 +49,12 @@ function renderTimeStamp() {
 }
 
 app.get("/health", (req, res) => {
-  console.log("Liveness probe checked at", renderTimeStamp());
+  console.log("Liveness probe ", renderTimeStamp());
   res.status(200).send("OK");
 });
 
 app.get("/", (req, res) => {
-  console.log("Readiness probe checked at", renderTimeStamp());
+  console.log("Readiness probe ", renderTimeStamp());
   res.status(200).send("OK");
 });
 
