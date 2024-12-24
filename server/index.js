@@ -43,18 +43,18 @@ function authenticateToken(req, res, next) {
   );
 }
 
-function renderTimeStamp(param) {
-  date = new Date();
-  return `${param} probe: ${date.getHours}:${date.getMinutes}:${date.getMilliseconds}`;
+function renderTimeStamp() {
+  const date = new Date();
+  return `${date.getHours()}:${date.getMinutes()}:${date.getMilliseconds()}`;
 }
 
 app.get("/health", (req, res) => {
-  console.log("Liveness probe checked at", renderTimeStamp("Liveness"));
+  console.log("Liveness probe checked at", renderTimeStamp());
   res.status(200).send("OK");
 });
 
 app.get("/", (req, res) => {
-  console.log("Readiness probe checked at", renderTimeStamp("Readiness"));
+  console.log("Readiness probe checked at", renderTimeStamp());
   res.status(200).send("OK");
 });
 
