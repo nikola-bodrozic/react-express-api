@@ -1,8 +1,9 @@
 // Login.tsx
 import React, { useState } from 'react';
-import { useAuth } from '../AuthContext';
+import "./Login.css"
+import { useAuth } from '../../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { axiosClient } from "../axiosClient";
+import { axiosClient } from "../../axiosClient";
 import { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 
@@ -34,7 +35,7 @@ const Login = () => {
             <h2>Login</h2>
             <form onSubmit={handleLogin}>
                 <div>
-                    <label htmlFor="username">Username</label>
+                    <label htmlFor="username">Username: </label>
                     <input
                         type="text"
                         data-testid="username"
@@ -44,7 +45,7 @@ const Login = () => {
                     />
                 </div>
                 <div>
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">Password: </label>
                     <input
                         type="password"
                         data-testid="password"
@@ -53,7 +54,7 @@ const Login = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <button type="submit" name="login">Login</button>
+                <button type="submit" className='button' name="login">Login</button>
             </form>
         </div>
     );

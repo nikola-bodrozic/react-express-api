@@ -1,9 +1,9 @@
 import './App.css'
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from "./components/Login";
+import Login from "./components/Login/Login";
 import Home from "./components/Home";
-import NavBar from "./components/NavBar";
+import NavBar from "./components/NavBar/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import { AuthProvider } from "./AuthContext";

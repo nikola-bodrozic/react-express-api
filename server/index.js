@@ -7,7 +7,8 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 // const fs = require('fs');
 // const path = require('path');
-const constants = require("./constants.js");
+const sqlite3 = require('sqlite3').verbose();
+const constants = require('./constants')
 
 dotenv.config();
 
@@ -16,6 +17,18 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+// initialise in memory database
+const db = new sqlite3.Database(':memory:');
+// populate database 
+db.serialize(() => {
+  db.run("CREATE TABLE IF NOT EXISTS users ( ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, USERNAME TEXT NOT NULL, PASSWORD CHAR(50));");
+  const stmt = db.prepare("INSERT INTO users (name, username, password) VALUES (?, ?, ?);");
+  for (let i = 1; i <= 3; i++) {
+    stmt.run(`Name ${i}`, `username${i}`, `pass${i}`);
+  }
+  stmt.finalize();
+});
 
 // morganBody(app, { stream: accessLogStream, noColors: true, logAllReqHeader: true, logAllResHeader: true });
 // or
@@ -48,33 +61,41 @@ function renderTimeStamp() {
   return `${date.getHours()}:${date.getMinutes()}:${date.getMilliseconds()}`;
 }
 
-app.get("/health", (req, res) => {
+const baseUrl = '/api/v1'
+
+app.get(baseUrl + "/health", (req, res) => {
   console.log("Liveness probe ", renderTimeStamp());
   res.status(200).send("OK");
 });
 
-app.get("/", (req, res) => {
+app.get(baseUrl + "/", (req, res) => {
   console.log("Readiness probe ", renderTimeStamp());
   res.status(200).send("OK");
 });
 
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  const user = { name: username };
-  if (username === "mike" && password === "123") {
-    const accessToken = generateAccessToken(user);
-    const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
-      expiresIn: "30min",
-    });
-    refreshTokens.push(refreshToken);
-    res.cookie("accessToken", accessToken, { httpOnly: true });
-    res.cookie("refreshToken", refreshToken, { httpOnly: true });
-    return res.status(200).json({ msg: constants.LOGIN_MESSAGE, name: "Mike" });
-  }
-  res.status(403).json({ msg: "Bad username or password" });
+app.post(baseUrl + "/login", (req, res) => {
+  const { username, password, name } = req.body;
+  db.all("SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1", [username, password], (err, rows) => {
+    if (err) {
+      console.log(err)
+      return;
+    }
+    if (rows.length === 1) {
+      const user = { id: rows[0].ID, name: rows[0].NAME, username: rows[0].USERNAME }
+      const accessToken = generateAccessToken(user);
+      const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: "30min",
+      });
+      refreshTokens.push(refreshToken);
+      res.cookie("accessToken", accessToken, { httpOnly: true });
+      res.cookie("refreshToken", refreshToken, { httpOnly: true });
+      return res.status(200).json({ msg: constants.LOGIN_MESSAGE, name: rows[0].name });
+    }
+    res.status(403).json({ msg: "Bad username or password" });
+  });
 });
 
-app.post("/token", (req, res) => {
+app.post(baseUrl + "/token", (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (refreshToken == null) return res.sendStatus(401);
   if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
@@ -85,18 +106,18 @@ app.post("/token", (req, res) => {
   });
 });
 
-app.delete("/logout", (req, res) => {
+app.delete(baseUrl + "/logout", (req, res) => {
   refreshTokens.filter((token) => token !== req.cookies.refreshToken);
   res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
   res.cookie("accessToken", "", { httpOnly: true, expires: new Date(0) });
   res.json({ msg: "HTTP-only tokens has been removed!" });
 });
 
-app.get("/dashboard", authenticateToken, (req, res) => {
+app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
   res.json({ message: "welcome to dasboard", user: req.user });
 });
 
-app.get("/clear", (req, res) => {
+app.get(baseUrl + "/clear", (req, res) => {
   const refreshTokens = [];
   res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
   res.cookie("accessToken", "", { httpOnly: true, expires: new Date(0) });
@@ -110,5 +131,6 @@ function generateAccessToken(user) {
 }
 
 app.listen(port, () => {
+
   console.log("Authentication service started on port " + port);
 });

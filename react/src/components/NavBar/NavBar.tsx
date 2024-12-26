@@ -2,7 +2,7 @@
 import React from 'react';
 import './NavBar.css'
 import { Link } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../../AuthContext';
 
 const NavBar: React.FC = () => {
     const { isAuthenticated, name } = useAuth()
