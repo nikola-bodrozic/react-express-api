@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { axiosClient } from "./axiosClient";
+import { axiosClient } from "../axiosClient";
 import { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 

@@ -10,9 +10,9 @@ import { AuthProvider } from "./AuthContext";
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import Logout from "./components/Logout";
+import About from './components/About';
 
 function App() {
-
   return (
     <>
       <div className="App">
@@ -21,6 +21,7 @@ function App() {
             <NavBar />
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
