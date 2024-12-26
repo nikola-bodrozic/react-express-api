@@ -69,7 +69,7 @@ app.post("/login", (req, res) => {
     refreshTokens.push(refreshToken);
     res.cookie("accessToken", accessToken, { httpOnly: true });
     res.cookie("refreshToken", refreshToken, { httpOnly: true });
-    return res.status(200).json({ msg: constants.LOGIN_MESSAGE });
+    return res.status(200).json({ msg: constants.LOGIN_MESSAGE, name: "Mike" });
   }
   res.status(403).json({ msg: "Bad username or password" });
 });

@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 
 const NavBar: React.FC = () => {
-    const { isAuthenticated } = useAuth()
-    console.log("NavBar")
+    const { isAuthenticated, name } = useAuth()
+    console.log("NavBar", typeof name, "---"+name+"---")
     return (
         <nav>
             <ul>
@@ -17,7 +17,7 @@ const NavBar: React.FC = () => {
                     <Link to="/about">About</Link>
                 </li>
                 <li>
-                    {isAuthenticated ? (<Link to="/logout">Logout</Link>) : (<Link to="/login">Login</Link>)}
+                    {isAuthenticated ? (<>Hello {name} <Link to="/logout">Logout</Link></>) : (<Link to="/login">Login</Link>)}
                 </li>
                 <li>
                     <Link to="/dashboard">Dashboard</Link>

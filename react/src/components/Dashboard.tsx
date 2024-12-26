@@ -10,7 +10,7 @@ const Dashboard: React.FC = () => {
         const fd = async () => {
             try {
                 const res: AxiosResponse = await axiosClient.get("/dashboard");
-                setMsg(JSON.stringify(res.data))
+                setMsg(JSON.stringify(res.data, null,2))
                 console.log(res.status, res.statusText)
             } catch (error: any) {
                 console.log(error)
