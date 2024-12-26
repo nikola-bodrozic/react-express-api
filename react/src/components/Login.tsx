@@ -7,6 +7,7 @@ import { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 
 const Login = () => {
+    console.log("login")
     const { login, logout } = useAuth();
     const navigate = useNavigate();
 

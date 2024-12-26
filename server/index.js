@@ -92,8 +92,8 @@ app.delete("/logout", (req, res) => {
   res.json({ msg: "HTTP-only tokens has been removed!" });
 });
 
-app.get("/protected", authenticateToken, (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
+app.get("/dashboard", authenticateToken, (req, res) => {
+  res.json({ message: "welcome to dasboard", user: req.user });
 });
 
 app.get("/clear", (req, res) => {

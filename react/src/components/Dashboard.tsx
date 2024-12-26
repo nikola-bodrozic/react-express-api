@@ -1,14 +1,29 @@
-import React from 'react';
+import { AxiosResponse } from 'axios';
+import React, { useEffect, useState } from 'react';
+import { axiosClient } from '../axiosClient';
 
 const Dashboard: React.FC = () => {
+    console.log("dashboard")
+    const [msg, setMsg] = useState("")
+
+    useEffect(() => {
+        const fd = async () => {
+            try {
+                const res: AxiosResponse = await axiosClient.get("/dashboard");
+                setMsg(JSON.stringify(res.data))
+                console.log(res.status, res.statusText)
+            } catch (error: any) {
+                console.log(error)
+                setMsg("API is down")
+            }
+        }
+
+        fd()
+    }, [])
     return (
-        <nav>
-            <ul>
-                <li>
-                    Welcome to Dashboard
-                </li>
-            </ul>
-        </nav>
+        <>
+            <p>{msg}</p>
+        </>
     );
 };
 
