@@ -1,6 +1,7 @@
 # Full Stack
 
-Express server & React TypeScript on Docker, on local dev environment and in Kubernetes cluster. Repo shows how to use: 
+Express server & React TypeScript on Docker, on local dev environment and in Kubernetes cluster. 
+Features: 
 - JWT access & refresh tokens 
 - HTTP only cookies
 
@@ -14,7 +15,8 @@ cp server/.env.sample server/.env
 
 ### Deployment in Local Environment
 
-install dependencies in `server/` and `react/` folders using `npm install` and use `npm start` in those folders to run apps
+In `react/` folders install dependancies with `npm install` and start the server with `npm run dev` 
+Install dependencies in `server/` folder with `npm install` and use `npm start` to start the server. 
 
 ### Deployment on Docker
 
