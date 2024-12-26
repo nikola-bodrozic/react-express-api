@@ -6,7 +6,6 @@ import { useAuth } from '../../AuthContext';
 
 const NavBar: React.FC = () => {
     const { isAuthenticated, name } = useAuth()
-    console.log("NavBar", typeof name, "---"+name+"---")
     return (
         <nav>
             <ul>

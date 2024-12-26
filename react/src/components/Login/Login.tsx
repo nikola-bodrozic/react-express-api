@@ -8,8 +8,7 @@ import { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 
 const Login = () => {
-    console.log("login")
-    const { login, logout, renderName} = useAuth();
+    const { login, logout, renderName } = useAuth();
     const navigate = useNavigate();
 
     const [username, setUsername] = useState('');
@@ -19,7 +18,7 @@ const Login = () => {
         e.preventDefault()
         try {
             const res: AxiosResponse = await axiosClient.post("/login", { username, password });
-            renderName(res.data.name)
+            renderName(res.data.user.name)
             login()
             toast.success('Logged in successfully!');
             navigate('/dashboard')

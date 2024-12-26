@@ -34,6 +34,10 @@ db.serialize(() => {
 // or
 // morganBody(app, { stream: accessLogStream, noColors: true });
 
+const baseUrl = '/api/v1'
+const refreshTokens = [];
+const port = 4000;
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -41,8 +45,6 @@ app.use(
   })
 );
 
-const refreshTokens = [];
-const port = 4000;
 
 function authenticateToken(req, res, next) {
   jwt.verify(
@@ -61,7 +63,6 @@ function renderTimeStamp() {
   return `${date.getHours()}:${date.getMinutes()}:${date.getMilliseconds()}`;
 }
 
-const baseUrl = '/api/v1'
 
 app.get(baseUrl + "/health", (req, res) => {
   console.log("Liveness probe ", renderTimeStamp());
@@ -74,13 +75,13 @@ app.get(baseUrl + "/", (req, res) => {
 });
 
 app.post(baseUrl + "/login", (req, res) => {
-  const { username, password, name } = req.body;
+  const { username, password } = req.body;
   db.all("SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1", [username, password], (err, rows) => {
     if (err) {
       console.log(err)
       return;
     }
-    if (rows.length === 1) {
+    if (rows.length) {
       const user = { id: rows[0].ID, name: rows[0].NAME, username: rows[0].USERNAME }
       const accessToken = generateAccessToken(user);
       const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
@@ -89,7 +90,7 @@ app.post(baseUrl + "/login", (req, res) => {
       refreshTokens.push(refreshToken);
       res.cookie("accessToken", accessToken, { httpOnly: true });
       res.cookie("refreshToken", refreshToken, { httpOnly: true });
-      return res.status(200).json({ msg: constants.LOGIN_MESSAGE, name: rows[0].name });
+      return res.status(200).json({ msg: constants.LOGIN_MESSAGE, user });
     }
     res.status(403).json({ msg: "Bad username or password" });
   });
@@ -131,6 +132,5 @@ function generateAccessToken(user) {
 }
 
 app.listen(port, () => {
-
   console.log("Authentication service started on port " + port);
 });
