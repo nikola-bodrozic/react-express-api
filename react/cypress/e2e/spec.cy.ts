@@ -15,6 +15,7 @@ describe('Login Test', () => {
     
     cy.url().should('include', '/dashboard')  // Replace with the expected URL after login
     cy.get('#name-holder').should('contain', 'Hello Name 1')
+    cy.get('#msg').should('contain', 'welcome to dasboard')
   })
 })
 

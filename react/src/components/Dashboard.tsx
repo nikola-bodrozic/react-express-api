@@ -19,7 +19,7 @@ const Dashboard: React.FC = () => {
         getData()
     }, [])
 
-    return <p>{msg}</p>
+    return <p id='msg'>{msg}</p>
 };
 
 export default Dashboard;
