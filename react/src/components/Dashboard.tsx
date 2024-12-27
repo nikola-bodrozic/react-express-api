@@ -9,7 +9,8 @@ const Dashboard: React.FC = () => {
         const getData = async () => {
             try {
                 const res: AxiosResponse = await axiosClient.get("/dashboard");
-                setMsg(JSON.stringify(res.data))
+                setMsg(res.data.message)
+                console.log(res.data)
             } catch (error: any) {
                 console.log(error)
                 setMsg("API is down")
