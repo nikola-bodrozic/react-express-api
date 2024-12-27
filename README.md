@@ -70,3 +70,5 @@ headless browser
 ```sh
 npx cypress run
 ```
+
+There are videos in folder `react/cypress/videos` and screenshots in `react/cypress/screenshots` 
