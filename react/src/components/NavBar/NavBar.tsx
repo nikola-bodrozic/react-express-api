@@ -10,16 +10,16 @@ const NavBar: React.FC = () => {
         <nav>
             <ul>
                 <li>
-                    <Link to="/">Home</Link>
+                    <Link to="/" id="home">Home</Link>
                 </li>
                 <li>
-                    <Link to="/about">About</Link>
+                    <Link to="/about" id="about">About</Link>
                 </li>
                 <li>
-                    {isAuthenticated ? (<>Hello {name} <Link to="/logout">Logout</Link></>) : (<Link to="/login">Login</Link>)}
+                    {isAuthenticated ? (<><span id="name-holder">Hello {name}</span> <Link to="/logout" id="logout">Logout</Link></>) : (<Link to="/login" id="login">Login</Link>)}
                 </li>
                 <li>
-                    <Link to="/dashboard">Dashboard</Link>
+                    <Link to="/dashboard" id="dashboard">Dashboard</Link>
                 </li>
             </ul>
         </nav>

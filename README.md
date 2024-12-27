@@ -58,3 +58,15 @@ second way to start k8s using
 ```sh
 kubectl apply -f k8s/bringupk8s.yaml
 ```
+
+### Running Cypress tests
+
+standard browser
+```sh
+npx cypress open
+```
+
+headless browser
+```sh
+npx cypress run
+```
