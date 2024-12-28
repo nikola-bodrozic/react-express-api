@@ -39,7 +39,7 @@ const Login = () => {
 
     return (
         <div>
-            <> {errorMessage.length > 0 && errorMessage.map((el: string) => <div style={{ color: "red" }}>{el}</div>)} </>
+            <div id="error"> {errorMessage.length > 0 && errorMessage.map((el: string, index: number) => <div key={index} style={{ color: "red" }}>{el}</div>)} </div>
             <h2>Login</h2>
             <form onSubmit={handleLogin}>
                 <div>
