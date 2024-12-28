@@ -7,12 +7,19 @@ import { axiosClient } from "../../axiosClient";
 import { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 
+interface errorMsg {
+    type?: string;
+    value?: string;
+    msg?: string;
+}
+
 const Login = () => {
     const { login, logout, renderName } = useAuth();
     const navigate = useNavigate();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState<string[]>([]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -23,14 +30,16 @@ const Login = () => {
             toast.success('Logged in successfully!');
             navigate('/dashboard')
         } catch (error: any) {
-            console.log(error)
-            toast.error('Invalid username or password');
+            const tmpErr: string[] = [];
+            error.response.data.errors.map((el: errorMsg) => tmpErr.push(el.msg as string))
+            setErrorMessage(tmpErr);
             logout()
         }
     };
 
     return (
         <div>
+            <> {errorMessage.length > 0 && errorMessage.map((el: string) => <div style={{ color: "red" }}>{el}</div>)} </>
             <h2>Login</h2>
             <form onSubmit={handleLogin}>
                 <div>

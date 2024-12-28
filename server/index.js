@@ -9,13 +9,15 @@ const cookieParser = require("cookie-parser");
 // const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const constants = require('./constants')
+const { validationResult } = require('express-validator');
+const { validateLogin } = require("./validateLogin");
 
 dotenv.config();
 
 // const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access-node.log'), { flags: 'a' });
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser());
 
 // initialise in memory database
@@ -74,7 +76,11 @@ app.get(baseUrl + "/", (req, res) => {
   res.status(200).send("OK");
 });
 
-app.post(baseUrl + "/login", (req, res) => {
+app.post(baseUrl + "/login", validateLogin, (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
   const { username, password } = req.body;
   db.all("SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1", [username, password], (err, rows) => {
     if (err) {
