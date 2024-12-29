@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: react-express-deployment
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: react-express-app
@@ -16,7 +16,7 @@ spec:
         - name: react
           image: 'nikolabod/react:latest'
           ports:
-            - containerPort: 3000
+            - containerPort: 80
           resources:
             limits:
               memory: "2Gi"
@@ -35,13 +35,13 @@ spec:
               cpu: "250m"
           livenessProbe:
             httpGet:
-              path: /healht
+              path: /api/v1/healht
               port: 4000
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/v1
               port: 4000
             initialDelaySeconds: 5
             periodSeconds: 10
@@ -57,8 +57,8 @@ spec:
     app: react-express-app
   ports:
     - protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: 80
+      targetPort: 80
   type: LoadBalancer
 ---
 apiVersion: v1

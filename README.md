@@ -23,21 +23,20 @@ Install dependencies in `server/` folder with `npm install` and use `npm run dev
 in root folder:
 
 ```sh
-docker compose up
+docker compose -f docker-compose-prod.yaml up
 ```
 
-### Deployment on Kubernetes
+### Deployment of production on Kubernetes
+
+in project root folder
 
 ```sh
-# in server folder
-docker build -t <YOUR-DOCKER-HUB-USERNAME>/server:latest .
+docker build -t <YOUR-DOCKER-HUB-USERNAME>/server:latest server/
 docker push <YOUR-DOCKER-HUB-USERNAME>/server:latest
 
-# in react folder
-docker build -t <YOUR-DOCKER-HUB-USERNAME>/react:latest .
+docker build -t <YOUR-DOCKER-HUB-USERNAME>/react:latest react/
 docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
 
-# in root folder
 kubectl apply -f k8s/server
 kubectl apply -f k8s/react
 ```
@@ -54,7 +53,7 @@ kubectl delete deployment server react
 kubectl delete services server-load-balancer react-load-balancer
 ```
 
-second way to start k8s using 
+second way is to start k8s using 
 
 ```sh
 # in root folder
@@ -62,6 +61,7 @@ kubectl apply -f k8s/bringupk8s.yaml
 ```
 
 ### Running Cypress tests
+
 in `react/` folder
 
 Cypress testing browser

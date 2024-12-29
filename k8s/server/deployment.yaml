@@ -15,6 +15,9 @@ spec:
       containers:
         - name: server
           image: 'nikolabod/server:latest'
+          env:
+          - name: NODE_ENV
+            value: "production"
           imagePullPolicy: Always
           resources: 
             requests: 
