@@ -60,6 +60,12 @@ second way is to start k8s using
 kubectl apply -f k8s/bringupk8s.yaml
 ```
 
+clean up
+```sh
+kubectl delete deployment react-express-deployment
+kubectl delete svc server-service react-service
+```
+
 ### Running Cypress tests
 
 in `react/` folder
