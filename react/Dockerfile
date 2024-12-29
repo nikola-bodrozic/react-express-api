@@ -1,15 +1,19 @@
-FROM node:alpine
+FROM node:alpine AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-RUN apk -U upgrade
-
-COPY package*.json ./
+COPY package*.json .
 
 RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+RUN npm run build
 
-CMD ["npm", "start"]
+FROM nginx:alpine
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+ 
+EXPOSE 80 
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -40,9 +40,15 @@ const baseUrl = '/api/v1'
 const refreshTokens = [];
 const port = 4000;
 
+let origin = "http://localhost";
+console.log(process.env.NODE_ENV)
+if (process.env.NODE_ENV === 'development') origin = origin + ":5173"
+
+console.log(origin)
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin,
     credentials: true,
   })
 );
