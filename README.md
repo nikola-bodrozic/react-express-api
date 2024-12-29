@@ -37,6 +37,7 @@ docker push <YOUR-DOCKER-HUB-USERNAME>/server:latest
 docker build -t <YOUR-DOCKER-HUB-USERNAME>/react:latest .
 docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
 
+# in root folder
 kubectl apply -f k8s/server
 kubectl apply -f k8s/react
 ```
@@ -56,12 +57,14 @@ kubectl delete services server-load-balancer react-load-balancer
 second way to start k8s using 
 
 ```sh
+# in root folder
 kubectl apply -f k8s/bringupk8s.yaml
 ```
 
 ### Running Cypress tests
+in `react/` folder
 
-standard browser
+Cypress testing browser
 ```sh
 npx cypress open
 ```
