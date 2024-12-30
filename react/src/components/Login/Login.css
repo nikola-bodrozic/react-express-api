@@ -11,6 +11,10 @@
     cursor: pointer;
 }
 
+.err-item {
+    color: red;
+}
+
 .loaderHolder {
     /* padding-top: 10px; */
     /* max-width: fit-content; */
