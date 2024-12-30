@@ -11,8 +11,8 @@ describe('Login Test', () => {
     cy.get('input[name="username"]').type('username1')
     cy.get('input[name="password"]').type('pass1')
     cy.get('button[type="submit"]').click()
+    cy.get('#loader').should('be.visible');
     cy.wait(1000)
-
     cy.url().should('include', '/dashboard')
     cy.get('#msg').should('contain', 'welcome to dasboard')
   })

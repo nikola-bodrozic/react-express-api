@@ -42,7 +42,7 @@ const Login = () => {
         }
     };
 
-    return (isLoading?<div className='loaderHolder'><Loader type="spinner-circle" bgColor={"green"} color={"red"} size={150} /></div>:
+    return (isLoading?<div className='loaderHolder' id="loader"><Loader type="spinner-circle" bgColor={"green"} color={"red"} size={150} /></div>:
         <div>
             <div id="error"> {errorMessage.length > 0 && errorMessage.map((el: string, index: number) => <div key={index} style={{ color: "red" }}>{el}</div>)} </div>
             
