@@ -10,3 +10,10 @@
     margin: 4px 2px;
     cursor: pointer;
 }
+
+.loaderHolder {
+    padding-top: 10px;;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}

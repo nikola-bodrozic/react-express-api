@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { axiosClient } from "../../axiosClient";
 import { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
+import Loader from 'react-js-loader';
 
 interface errorMsg {
     type?: string;
@@ -20,16 +21,20 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
+        setIsLoading(true)
         try {
             const res: AxiosResponse = await axiosClient.post("/login", { username, password });
             renderName(res.data.user.name)
             login()
             toast.success('Logged in successfully!');
+            setIsLoading(false)
             navigate('/dashboard')
         } catch (error: any) {
+            setIsLoading(false)
             const tmpErr: string[] = [];
             error.response.data.errors.map((el: errorMsg) => tmpErr.push(el.msg as string))
             setErrorMessage(tmpErr);
@@ -37,9 +42,10 @@ const Login = () => {
         }
     };
 
-    return (
+    return (isLoading?<div className='loaderHolder'><Loader type="spinner-circle" bgColor={"green"} color={"red"} size={150} /></div>:
         <div>
             <div id="error"> {errorMessage.length > 0 && errorMessage.map((el: string, index: number) => <div key={index} style={{ color: "red" }}>{el}</div>)} </div>
+            
             <h2>Login</h2>
             <form onSubmit={handleLogin}>
                 <div>
