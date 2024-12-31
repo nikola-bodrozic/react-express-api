@@ -2,6 +2,7 @@
 describe("Login Test", () => {
   const apiBaseURL = "http://localhost:4000/api/v1";
   const reactBaseURL = "http://localhost:5173/";
+
   beforeEach(() => {
     cy.visit(reactBaseURL);
     cy.get("#about").click();
@@ -10,8 +11,32 @@ describe("Login Test", () => {
     cy.url().should("include", "/login");
   });
 
-  it("should log in with valid credentials", () => {
-    cy.intercept("POST", `${apiBaseURL}/login`).as("postData");
+  afterEach(() => {
+    cy.wait(2000);
+  });
+
+  it("should log in with valid credentials and show dasboard", () => {
+    cy.intercept("POST", `${apiBaseURL}/login`, {
+      statusCode: 200,
+      body: {
+        msg: "Login successful",
+        user: { id: 1, name: "Name 1", username: "username1" },
+      },
+    }).as("postData");
+
+    cy.intercept("GET", `${apiBaseURL}/dashboard`, {
+      statusCode: 200,
+      body: {
+        message: "welcome to dasboard",
+        user: {
+          id: 1,
+          name: "Name 1",
+          username: "username1",
+          iat: 1735654427,
+          exp: 1735655327,
+        },
+      },
+    }).as("getData");
 
     cy.get('input[name="username"]').type("username1");
     cy.get('input[name="password"]').type("pass1");
@@ -23,8 +48,13 @@ describe("Login Test", () => {
         expect(interception.response.statusCode).to.equal(200);
       cy.get("#loader").should("not.exist");
     });
-    cy.url().should("include", "/dashboard");
-    cy.get("#msg").should("contain", "welcome to dasboard");
+    cy.wait("@getData").then((interception) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      interception.response &&
+        expect(interception.response.statusCode).to.equal(200);
+      cy.url().should("include", "/dashboard");
+      cy.get("#msg").should("contain", "welcome to dasboard");
+    });
   });
 
   it("should get error message when entering invalid credentials shorter tham 5 chars", () => {

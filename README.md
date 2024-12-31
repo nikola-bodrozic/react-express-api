@@ -65,7 +65,7 @@ tail -f access-node.log
 
 ### Running Cypress tests
 
-Make sure you are running local development environment
+Make sure you are running react in development mode.
 
 in `react/` folder
 
