@@ -2,4 +2,7 @@ Dockerfile
 .dockerignore
 .gitignore
 build
+dist
 node_modules
+cypress
+cypress.config.ts

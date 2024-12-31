@@ -15,8 +15,8 @@ cp server/.env.sample server/.env
 
 ### Deployment in Local Environment
 
-In `react/` folders install dependancies with `npm install` and start the server with `npm run dev` 
-Install dependencies in `server/` folder with `npm install` and use `npm run dev` to start the server. 
+In `react/` folders install dependancies with `yarn` and start the React app with `npm run dev`.
+Install dependencies in `server/` folder with `yarn` and use `npm run dev` to start the API server. 
 
 ### Deployment of production using Docker Compose
 

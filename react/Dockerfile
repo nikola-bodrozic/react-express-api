@@ -4,11 +4,17 @@ WORKDIR /app
 
 COPY package*.json .
 
+RUN ls -lA
+
 RUN npm install
 
 COPY . .
 
+RUN ls -lA
+
 RUN npm run build
+
+RUN ls -lA
 
 FROM nginx:alpine
 

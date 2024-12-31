@@ -1,10 +1,14 @@
 FROM node:alpine
 
+RUN apk add --no-cache yarn
+
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package.json .
 
-RUN npm install --only=production
+COPY yarn.lock .
+
+RUN yarn install --production
 
 COPY . .
 
