@@ -15,13 +15,25 @@ spec:
       containers:
         - name: server
           image: 'nikolabod/server:latest'
+          livenessProbe:
+            httpGet:
+              path: /api/v1/
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 3
           env:
           - name: NODE_ENV
             value: "production"
           imagePullPolicy: Always
           resources: 
             requests: 
-              memory: "2Gi" 
+              memory: "1Gi" 
               cpu: "800m" 
             limits: 
               memory: "2Gi" 
