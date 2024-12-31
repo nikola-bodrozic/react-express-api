@@ -1,11 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-// const morganBody = require('morgan-body');
+const morganBody = require('morgan-body');
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-// const fs = require('fs');
-// const path = require('path');
+const fs = require('fs');
+const path = require('path');
 const sqlite3 = require("sqlite3").verbose();
 const constants = require("./constants");
 const { validationResult } = require("express-validator");
@@ -13,7 +13,7 @@ const { validateLogin } = require("./validateLogin");
 
 dotenv.config();
 
-// const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access-node.log'), { flags: 'a' });
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access-node.log'), { flags: 'a' });
 const app = express();
 
 app.use(express.json());
@@ -35,7 +35,7 @@ db.serialize(() => {
   stmt.finalize();
 });
 
-// morganBody(app, { stream: accessLogStream, noColors: true, logAllReqHeader: true, logAllResHeader: true });
+morganBody(app, { stream: accessLogStream, noColors: true, logAllReqHeader: true, logAllResHeader: true });
 // or
 // morganBody(app, { stream: accessLogStream, noColors: true });
 
