@@ -13,10 +13,21 @@ const { validateLogin } = require("./validateLogin");
 
 dotenv.config();
 
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, "access-node.log"),
-  { flags: "a" }
-);
+// path to log file
+const filePath = path.join(__dirname, "access-node.log");
+// delete old log file if it exists
+fs.access(filePath, fs.constants.F_OK, (err) => {
+  if (err) {
+    console.log("Log file does not exist. Will be created on first API call");
+  } else {
+    fs.unlink(filePath, (err) => {
+      if (err) throw err;
+      console.log("Log file deleted successfully.");
+    });
+  }
+});
+
+const accessLogStream = fs.createWriteStream(filePath, { flags: "a" });
 const app = express();
 
 app.use(express.json());
@@ -38,7 +49,12 @@ db.serialize(() => {
   stmt.finalize();
 });
 
-morganBody(app, { stream: accessLogStream, noColors: true, logAllReqHeader: true, logAllResHeader: true });
+morganBody(app, {
+  stream: accessLogStream,
+  noColors: true,
+  logAllReqHeader: true,
+  logAllResHeader: true,
+});
 // or
 // morganBody(app, { stream: accessLogStream, noColors: true });
 
