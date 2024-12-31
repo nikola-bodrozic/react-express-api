@@ -65,18 +65,17 @@ tail -f access-node.log
 
 ### Running Cypress tests
 
-Make sure you are running react in development mode.
+bring up docker stack using docker compose up and in `react/` folder open Cypress testing browser
+```sh
+cd react/
+npx cypress open
+```
+and click on spec login.cy.ts in production folder. After running tests bring down docker stack using docker compose down
 
-in `react/` folder
-
-Cypress testing browser
+start your local dev environment run again
 ```sh
 npx cypress open
 ```
-
-headless browser
-```sh
-npx cypress run
-```
+and click on spec login.cy.ts in local-dev folder
 
 There are videos in folder `react/cypress/videos` and screenshots in `react/cypress/screenshots` 
