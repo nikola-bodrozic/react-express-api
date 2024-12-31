@@ -20,9 +20,8 @@ fs.access(filePath, fs.constants.F_OK, (err) => {
   if (err) {
     console.log("Log file does not exist. Will be created on first API call");
   } else {
-    fs.unlink(filePath, (err) => {
-      if (err) throw err;
-      console.log("Log file deleted successfully.");
+    fs.unlink(filePath, () => {
+      console.log("Old log file deleted successfully.");
     });
   }
 });

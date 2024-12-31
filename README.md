@@ -55,6 +55,14 @@ kubectl delete deployment server react
 kubectl delete services server-load-balancer react-load-balancer
 ```
 
+### Reading Express log
+
+exec into server container and you can monitor log in real time
+
+```sh
+tail -f access-node.log
+```
+
 ### Running Cypress tests
 
 Make sure you are running local development environment
