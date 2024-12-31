@@ -41,7 +41,7 @@ kubectl apply -f k8s/server
 kubectl apply -f k8s/react
 ```
 
-clean up
+make sure services and deployments are up and running
 
 ```sh
 kubectl get svc
