@@ -1,7 +1,8 @@
 /// <reference types="cypress" />
 describe("Login Test", () => {
-  const apiBaseURL = "http://localhost:4000/api/v1";
-  const reactBaseURL = "http://localhost:5173/";
+  const base = "http://localhost:"
+  const apiBaseURL = `${base}4000/api/v1`;
+  const reactBaseURL = `${base}5173/`;
 
   beforeEach(() => {
     cy.visit(reactBaseURL);
@@ -54,6 +55,10 @@ describe("Login Test", () => {
         expect(interception.response.statusCode).to.equal(200);
       cy.url().should("include", "/dashboard");
       cy.get("#msg").should("contain", "welcome to dasboard");
+      cy.get("#name-holder").should("contain", "Hello Name 1");
+      cy.get("#logout").click()
+      cy.url().should("include", "/");
+      cy.get("#login").should("contain", "Login");
     });
   });
 
