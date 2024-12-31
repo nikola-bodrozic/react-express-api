@@ -27,7 +27,7 @@ describe("Login Test", () => {
     cy.get("#msg").should("contain", "welcome to dasboard");
   });
 
-  it("should get error message when entering invalid credentials", () => {
+  it("should get error message when entering invalid credentials shorter tham 5 chars", () => {
     cy.intercept("POST", `${apiBaseURL}/login`, {
       statusCode: 422,
       body: {
@@ -59,5 +59,33 @@ describe("Login Test", () => {
     cy.get("#error .err-item")
       .eq(1)
       .should("have.text", "test Password must be at least 5 characters long");
+  });
+
+  it("should get error message when entering invalid credentials", () => {
+    cy.intercept("POST", `${apiBaseURL}/login`, {
+      statusCode: 422,
+      body: {
+        errors: [
+          {
+            msg: "test bad username/password",
+          },
+        ],
+      },
+    }).as("postData");
+
+    cy.get('input[name="username"]').type("wrong-username");
+    cy.get('input[name="password"]').type("wrong-password");
+    cy.get('button[type="submit"]').click();
+    cy.get("#loader").should("be.visible");
+    cy.wait("@postData").then((interception) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      interception.response &&
+        expect(interception.response.statusCode).to.equal(422);
+      cy.get("#loader").should("not.exist");
+    });
+    cy.get("#error").children().should("have.length.greaterThan", 0);
+    cy.get("#error .err-item")
+      .first()
+      .should("have.text", "test bad username/password");
   });
 });

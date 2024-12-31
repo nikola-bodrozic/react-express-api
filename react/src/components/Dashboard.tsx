@@ -11,6 +11,7 @@ const Dashboard: React.FC = () => {
                 const res: AxiosResponse = await axiosClient.get("/dashboard");
                 setMsg(res.data.message)
                 console.log(res.data)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 console.log(error)
                 setMsg("API is down")
