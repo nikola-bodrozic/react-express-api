@@ -1,11 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const morganBody = require('morgan-body');
+const morganBody = require("morgan-body");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const constants = require("./constants");
 const { validationResult } = require("express-validator");
@@ -13,7 +13,10 @@ const { validateLogin } = require("./validateLogin");
 
 dotenv.config();
 
-const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access-node.log'), { flags: 'a' });
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access-node.log"),
+  { flags: "a" }
+);
 const app = express();
 
 app.use(express.json());
@@ -85,37 +88,37 @@ app.get(baseUrl + "/", (req, res) => {
 app.post(baseUrl + "/login", validateLogin, (req, res) => {
   // setTimeout to see loader in Login.tsx
   // setTimeout(()=>{
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-    const { username, password } = req.body;
-    db.all(
-      "SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1",
-      [username, password],
-      (err, rows) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        if (rows.length) {
-          const user = {
-            id: rows[0].ID,
-            name: rows[0].NAME,
-            username: rows[0].USERNAME,
-          };
-          const accessToken = generateAccessToken(user);
-          const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
-            expiresIn: "30min",
-          });
-          refreshTokens.push(refreshToken);
-          res.cookie("accessToken", accessToken, { httpOnly: true });
-          res.cookie("refreshToken", refreshToken, { httpOnly: true });
-          return res.status(200).json({ msg: constants.LOGIN_MESSAGE, user });
-        }
-        res.status(403).json({ msg: "Bad username or password" });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  const { username, password } = req.body;
+  db.all(
+    "SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1",
+    [username, password],
+    (err, rows) => {
+      if (err) {
+        console.log(err);
+        return;
       }
-    );
+      if (rows.length) {
+        const user = {
+          id: rows[0].ID,
+          name: rows[0].NAME,
+          username: rows[0].USERNAME,
+        };
+        const accessToken = generateAccessToken(user);
+        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+          expiresIn: "30min",
+        });
+        refreshTokens.push(refreshToken);
+        res.cookie("accessToken", accessToken, { httpOnly: true });
+        res.cookie("refreshToken", refreshToken, { httpOnly: true });
+        return res.status(200).json({ msg: constants.LOGIN_MESSAGE, user });
+      }
+      res.status(403).json({ msg: "Bad username or password" });
+    }
+  );
   // }, 1500)
 });
 
