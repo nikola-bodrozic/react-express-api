@@ -7,15 +7,11 @@ Features:
 
 ## Prepare
 
-in `server/` folder create `.env` file  and set values for ACCESS_TOKEN_SECRET & REFRESH_TOKEN_SECRET
-
-```sh
-cp server/.env.sample server/.env
-```
+in `server/` folder rename `.env.sample` to `.env` file  and set values for ACCESS_TOKEN_SECRET & REFRESH_TOKEN_SECRET
 
 ### Deployment in Local Environment
 
-In `react/` folders install dependancies with `yarn` and start the React app with `npm run dev`.
+In `react/` folders install dependancies with `npm install` and start the React app with `npm run dev`.
 Install dependencies in `server/` folder with `yarn` and use `npm run dev` to start the API server. 
 
 ### Deployment of production using Docker Compose
@@ -61,12 +57,15 @@ kubectl apply -f k8s/bringupk8s.yaml
 ```
 
 clean up
+
 ```sh
 kubectl delete deployment react-express-deployment
 kubectl delete svc server-service react-service
 ```
 
 ### Running Cypress tests
+
+Make sure you are running local development environment
 
 in `react/` folder
 
