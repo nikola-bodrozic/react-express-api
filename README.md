@@ -42,33 +42,13 @@ clean up
 ```sh
 kubectl get svc
 kubectl get deployments
+```
 
-# delete depl. and services
+delete depl. and services
 
+```sh
 kubectl delete deployment server react
 kubectl delete services server-load-balancer react-load-balancer
-```
-
-second way is to start k8s using 
-
-```sh
-# in root folder
-kubectl apply -f k8s/bringupk8s.yaml
-```
-
-run 
-
-```sh
-kubectl get deployments --watch
-```
-
-untill you get
-
-clean up
-
-```sh
-kubectl delete deployment react-express-deployment
-kubectl delete svc server-service react-service
 ```
 
 ### Running Cypress tests
