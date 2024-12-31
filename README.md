@@ -56,6 +56,14 @@ second way is to start k8s using
 kubectl apply -f k8s/bringupk8s.yaml
 ```
 
+run 
+
+```sh
+kubectl get deployments --watch
+```
+
+untill you get
+
 clean up
 
 ```sh
