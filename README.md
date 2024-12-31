@@ -26,13 +26,17 @@ docker compose -f docker-compose-prod.yaml up
 
 in project root folder
 
+build images
 ```sh
 docker build -t <YOUR-DOCKER-HUB-USERNAME>/server:latest server/
 docker push <YOUR-DOCKER-HUB-USERNAME>/server:latest
 
 docker build -t <YOUR-DOCKER-HUB-USERNAME>/react:latest react/
 docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
+```
 
+start deployments and services
+```sh
 kubectl apply -f k8s/server
 kubectl apply -f k8s/react
 ```
