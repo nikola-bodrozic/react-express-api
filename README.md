@@ -55,6 +55,20 @@ kubectl delete deployment server react
 kubectl delete services server-load-balancer react-load-balancer
 ```
 
+or second way using Pod deployment
+
+```sh
+kubectl apply -f k8s/cluster/
+```
+
+these are resouces that needs to deleted during clean up
+
+```sh
+kubectl get svc
+kubectl get pods
+kubectl get deployments
+```
+
 ### Reading Express log
 
 exec into server container and you can monitor log in real time
@@ -79,3 +93,41 @@ npx cypress open
 and click on spec login.cy.ts in local-dev folder
 
 There are videos in folder `react/cypress/videos` and screenshots in `react/cypress/screenshots` 
+
+### cURL calls against API
+
+POSTing username and password
+
+```sh
+curl -i 'http://localhost:4000/api/v1/login' --no-progress-meter -X POST \
+-H 'Accept: application/json, text/plain, */*' \
+-H 'Accept-Encoding: gzip, deflate, br, zstd' \
+-H 'Content-Type: application/json' \
+-H 'Origin: http://localhost' \
+-H 'Connection: keep-alive' \
+-H 'Referer: http://localhost/' \
+-H 'Sec-Fetch-Dest: empty' \
+-H 'Sec-Fetch-Mode: cors' \
+-H 'Sec-Fetch-Site: same-site' \
+-H 'Priority: u=0' \
+-H 'Pragma: no-cache' \
+-H 'Cache-Control: no-cache' \
+--data-raw '{"username":"q","password":"q"}'
+```
+
+GET protected route
+```sh
+curl 'http://localhost:4000/api/v1/dashboard' --no-progress-meter \
+-H 'Accept: application/json, text/plain, */*' \
+-H 'Accept-Language: en-US,en;q=0.5' \
+-H 'Accept-Encoding: gzip, deflate, br, zstd' \
+-H 'Origin: http://localhost' \
+-H 'Connection: keep-alive' \
+-H 'Referer: http://localhost/' \
+-H 'Cookie: accessToken=eyJhbGci...6vvoq8; refreshToken=eyJhbGcB...1S0' \
+-H 'Sec-Fetch-Dest: empty' \
+-H 'Sec-Fetch-Mode: cors' \
+-H 'Sec-Fetch-Site: same-site' \
+-H 'Pragma: no-cache' \
+-H 'Cache-Control: no-cache'
+```

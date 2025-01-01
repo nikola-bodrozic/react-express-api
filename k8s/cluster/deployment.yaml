@@ -1,0 +1,88 @@
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: shared-pv
+# spec:
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: "/home/your-username/data"
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: shared-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-node-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: react-node
+  template:
+    metadata:
+      labels:
+        app: react-node
+    spec:
+      containers:
+      - name: react
+        image: "nikolabod/react:latest"
+        ports:
+        - containerPort: 80
+        # volumeMounts:
+        # - mountPath: /app/config
+        #   name: shared-config
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        # resources:
+        #   requests:
+        #     memory: "1Gi"
+        #     cpu: "500m"
+        #   limits:
+        #     memory: "2Gi"
+        #     cpu: "1000m"
+      - name: node
+        image: "nikolabod/server:latest"
+        ports:
+        - containerPort: 4000
+        # volumeMounts:
+        # - mountPath: /app/config
+        #   name: shared-config
+        env:
+        - name: NODE_ENV
+          value: "production"
+        # resources:
+        #   requests:
+        #     memory: "2Gi"
+        #     cpu: "800m"
+        #   limits:
+        #     memory: "2Gi"
+        #     cpu: "1000m"
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health/
+            port: 4000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /api/v1/
+            port: 4000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      # volumes:
+      # - name: shared-config
+      #   persistentVolumeClaim:
+      #     claimName: shared-pvc

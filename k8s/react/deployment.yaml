@@ -19,5 +19,12 @@ spec:
           - name: NODE_ENV
             value: "production"        
           imagePullPolicy: Always
+          resources: 
+            requests: 
+              memory: "1Gi" 
+              cpu: "1000m" 
+            limits: 
+              memory: "2Gi" 
+              cpu: "1000m" 
           ports:
             - containerPort: 80
