@@ -61,7 +61,7 @@ or second way using Pod deployment
 kubectl apply -f k8s/cluster/
 ```
 
-these are resouces that needs to deleted during clean up
+this lists resouces that need to be deleted during clean up
 
 ```sh
 kubectl get svc

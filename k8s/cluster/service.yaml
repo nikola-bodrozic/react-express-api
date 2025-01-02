@@ -8,16 +8,16 @@ spec:
   - port: 80
     targetPort: 80
   selector:
-    app: react-node
+    app: react-express-api
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: node-service
+  name: server-service
 spec:
   type: LoadBalancer
   ports:
   - port: 4000
     targetPort: 4000
   selector:
-    app: react-node
+    app: react-express-api
