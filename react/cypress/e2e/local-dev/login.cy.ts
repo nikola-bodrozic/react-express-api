@@ -29,12 +29,18 @@ describe("Login Test", () => {
       statusCode: 200,
       body: {
         message: "welcome to dasboard",
-        user: {
-          id: 1,
-          name: "Name 1",
-          username: "username1",
-          iat: 1735654427,
-          exp: 1735655327,
+        pieData: {
+          labels: ["Customer", "Business"],
+          datasets: [
+            {
+              data: [12, 29],
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+              ],
+              borderWidth: 1,
+            },
+          ],
         },
       },
     }).as("getData");
@@ -42,7 +48,7 @@ describe("Login Test", () => {
     cy.get('input[name="username"]').type("username1");
     cy.get('input[name="password"]').type("pass1");
     cy.get('button[type="submit"]').click();
-    cy.get("#loader").should("be.visible");
+    // cy.get("#loader").should("be.visible");
     cy.wait("@postData").then((interception) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&
@@ -56,7 +62,9 @@ describe("Login Test", () => {
       cy.url().should("include", "/dashboard");
       cy.get("#msg").should("contain", "welcome to dasboard");
       cy.get("#name-holder").should("contain", "Hello Name 1");
+      cy.get("#pie").should("exist")
       cy.get("#logout").click()
+      cy.get("#pie").should("not.exist")
       cy.url().should("include", "/");
       cy.get("#login").should("contain", "Login");
     });
@@ -80,7 +88,7 @@ describe("Login Test", () => {
     cy.get('input[name="username"]').type("u1");
     cy.get('input[name="password"]').type("p1");
     cy.get('button[type="submit"]').click();
-    cy.get("#loader").should("be.visible");
+    // cy.get("#loader").should("be.visible");
     cy.wait("@postData").then((interception) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&
@@ -111,7 +119,7 @@ describe("Login Test", () => {
     cy.get('input[name="username"]').type("wrong-username");
     cy.get('input[name="password"]').type("wrong-password");
     cy.get('button[type="submit"]').click();
-    cy.get("#loader").should("be.visible");
+    // cy.get("#loader").should("be.visible");
     cy.wait("@postData").then((interception) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&

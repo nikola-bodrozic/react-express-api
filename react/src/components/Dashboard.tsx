@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
     <>
       <p id="msg">{msg}</p>
       <div style={{ border: "1px solid black", margin: "20px", padding: "5px" }}>
-        <Pie data={pieData as IData} width={"80%"} options={{ maintainAspectRatio: false }} />
+        <Pie id="pie" data={pieData as IData} width={"80%"} options={{ maintainAspectRatio: false }} />
       </div>
     </>
   );
