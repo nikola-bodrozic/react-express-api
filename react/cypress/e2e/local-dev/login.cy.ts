@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 describe("Login Test", () => {
-  const base = "http://localhost:"
+  const base = "http://localhost:";
   const apiBaseURL = `${base}4000/api/v1`;
   const reactBaseURL = `${base}5173/`;
 
@@ -35,8 +35,8 @@ describe("Login Test", () => {
             {
               data: [12, 29],
               backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
+                "rgba(255, 99, 132, 0.2)",
+                "rgba(54, 162, 235, 0.2)",
               ],
               borderWidth: 1,
             },
@@ -48,7 +48,7 @@ describe("Login Test", () => {
     cy.get('input[name="username"]').type("username1");
     cy.get('input[name="password"]').type("pass1");
     cy.get('button[type="submit"]').click();
-    // cy.get("#loader").should("be.visible");
+    cy.get("#loader").should("be.visible");
     cy.wait("@postData").then((interception) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&
@@ -62,9 +62,9 @@ describe("Login Test", () => {
       cy.url().should("include", "/dashboard");
       cy.get("#msg").should("contain", "welcome to dasboard");
       cy.get("#name-holder").should("contain", "Hello Name 1");
-      cy.get("#pie").should("exist")
-      cy.get("#logout").click()
-      cy.get("#pie").should("not.exist")
+      cy.get("#pie").should("exist");
+      cy.get("#logout").click();
+      cy.get("#pie").should("not.exist");
       cy.url().should("include", "/");
       cy.get("#login").should("contain", "Login");
     });
