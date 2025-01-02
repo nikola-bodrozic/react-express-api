@@ -96,7 +96,7 @@ There are videos in folder `react/cypress/videos` and screenshots in `react/cypr
 
 ### cURL calls against API
 
-POSTing username and password
+POSTing wrong username and password
 
 ```sh
 curl -i 'http://localhost:4000/api/v1/login' --no-progress-meter -X POST \

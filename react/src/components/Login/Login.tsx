@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { axiosClient } from "../../axiosClient";
 import { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
-import Loader from "react-js-loader";
 
 interface errorMsg {
   type?: string;
@@ -48,13 +47,8 @@ const Login = () => {
   };
 
   return isLoading ? (
-    <div className="loaderHolder" id="loader">
-      <Loader
-        type="spinner-circle"
-        bgColor={"green"}
-        color={"red"}
-        size={150}
-      />
+    <div>
+      Loading...
     </div>
   ) : (
     <>

@@ -155,8 +155,23 @@ app.delete(baseUrl + "/logout", (req, res) => {
   res.json({ msg: "HTTP-only tokens has been removed!" });
 });
 
-app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
-  res.json({ message: "welcome to dasboard", user: req.user });
+app.get(baseUrl + "/dashboard", authenticateToken,(req, res) => {
+  res.json({
+    message: "welcome to dasboard",
+    pieData: {
+      labels: ["Customer", "Business"],
+      datasets: [
+        {
+          data: [12, 29],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+          ],
+          borderWidth: 1,
+        },
+      ],
+    },
+  });
 });
 
 app.get(baseUrl + "/clear", (req, res) => {
