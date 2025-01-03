@@ -11,11 +11,30 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import Logout from "./components/Logout";
 import About from './components/About';
+import { useEffect, useState } from 'react';
+import { axiosClient } from './axiosClient';
+import { AxiosResponse } from 'axios';
 
 function App() {
+  const [podInfo, setPodInfo] = useState("")
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res: AxiosResponse = await axiosClient.get("/pod");
+        console.log(res.data.pod)
+        setPodInfo(res.data.pod)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.log(error);
+      }
+    };
+    getData();
+  }, []);
   return (
     <>
       <div className="App">
+        <p>{JSON.stringify(podInfo)}</p>
         <AuthProvider>
           <Router>
             <NavBar />

@@ -5,6 +5,7 @@ const morganBody = require("morgan-body");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const fs = require("fs");
+const os = require("os")
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const constants = require("./constants");
@@ -93,6 +94,17 @@ function renderTimeStamp() {
 app.get(baseUrl + "/health", (req, res) => {
   console.log("Liveness probe ", renderTimeStamp());
   res.status(200).send("OK");
+});
+
+app.get(baseUrl + "/pod", (req, res) => {
+  console.log("Liveness probe ", renderTimeStamp());
+  const pod = {
+    podID: os.hostname(),
+    podIP: os.neworkInterfaces().eth0[0].address,
+    podName: process.env.POD_NAME,
+    namespace: process.env.POD_NAMESPACE
+  }
+  res.json(pod);
 });
 
 app.get(baseUrl + "/", (req, res) => {
