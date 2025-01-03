@@ -99,7 +99,7 @@ app.get(baseUrl + "/health", (req, res) => {
 app.get(baseUrl + "/pod", (req, res) => {
   console.log("nb",os.hostname(), process.env.POD_NAME, process.env.POD_NAMESPACE)
   const pod = {
-    podID: "m "+os.hostname(),
+    podID: os.hostname(),
     podName: process.env.POD_NAME,
     namespace: process.env.POD_NAMESPACE
   }
