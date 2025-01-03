@@ -9,7 +9,7 @@ spec:
   - name: backend
     port: 4000
     targetPort: 4000
-  - name: fronend:
+  - name: fronend
     port: 80
     targetPort: 80
   type: ClusterIP
