@@ -55,10 +55,11 @@ kubectl delete deployment server react
 kubectl delete services server-load-balancer react-load-balancer
 ```
 
-or second way using Pod deployment
+or second way by using files in `k8s/cluster` folder
 
 ```sh
-kubectl apply -f k8s/cluster/
+kubectl apply -f k8s/cluster/deployment.yaml
+kubectl apply -f k8s/cluster/service.yaml
 ```
 
 this lists resouces that need to be deleted during clean up
