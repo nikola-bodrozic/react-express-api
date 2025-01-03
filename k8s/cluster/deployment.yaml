@@ -54,13 +54,13 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        resources:
-          requests:
-            memory: "2Gi"
-            cpu: "1000m"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
+        # resources:
+        #   requests:
+        #     memory: "2Gi"
+        #     cpu: "1000m"
+        #   limits:
+        #     memory: "2Gi"
+        #     cpu: "1000m"
       - name: server
         image: "nikolabod/server:latest"
         ports:
@@ -71,13 +71,13 @@ spec:
         env:
         - name: NODE_ENV
           value: "production"
-        resources:
-          requests:
-            memory: "2Gi"
-            cpu: "800m"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
+        # resources:
+        #   requests:
+        #     memory: "2Gi"
+        #     cpu: "800m"
+        #   limits:
+        #     memory: "2Gi"
+        #     cpu: "1000m"
         readinessProbe:
           httpGet:
             path: /api/v1/health/

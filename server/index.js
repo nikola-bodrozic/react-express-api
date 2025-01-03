@@ -97,10 +97,9 @@ app.get(baseUrl + "/health", (req, res) => {
 });
 
 app.get(baseUrl + "/pod", (req, res) => {
-  console.log("Liveness probe ", renderTimeStamp());
+  console.log("pod info ", renderTimeStamp());
   const pod = {
     podID: os.hostname(),
-    podIP: os.neworkInterfaces().eth0[0].address,
     podName: process.env.POD_NAME,
     namespace: process.env.POD_NAMESPACE
   }
