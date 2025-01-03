@@ -1,9 +1,10 @@
 # Full Stack
 
-Express server & React TypeScript on Docker, on local dev environment and in Kubernetes cluster. 
+Express API server & React TypeScript on local dev environment, Docker stack and in Kubernetes cluster. 
 Features: 
 - JWT access & refresh tokens 
 - HTTP only cookies
+- Cypress testing
 
 ## Prepare
 
@@ -26,7 +27,8 @@ docker compose -f docker-compose-prod.yaml up
 
 in project root folder
 
-build images
+build and push images
+
 ```sh
 docker build -t <YOUR-DOCKER-HUB-USERNAME>/server:latest server/
 docker push <YOUR-DOCKER-HUB-USERNAME>/server:latest
@@ -35,27 +37,7 @@ docker build -t <YOUR-DOCKER-HUB-USERNAME>/react:latest react/
 docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
 ```
 
-start deployments and services
-```sh
-kubectl apply -f k8s/server
-kubectl apply -f k8s/react
-```
-
-make sure services and deployments are up and running
-
-```sh
-kubectl get svc
-kubectl get deployments
-```
-
-delete depl. and services
-
-```sh
-kubectl delete deployment server react
-kubectl delete services server-load-balancer react-load-balancer
-```
-
-or second way by using files in `k8s/cluster` folder
+run deployment and services:
 
 ```sh
 kubectl apply -f k8s/cluster/deployment.yaml
@@ -72,7 +54,7 @@ kubectl get deployments
 
 ### Reading Express log
 
-exec into server container and you can monitor log in real time
+exec into Express server container and you can monitor HTTP traffic log in real time
 
 ```sh
 tail -f access-node.log
@@ -80,14 +62,14 @@ tail -f access-node.log
 
 ### Running Cypress tests
 
-bring up docker stack using docker compose up and in `react/` folder open Cypress testing browser
+bring up docker stack using `docker compose up` and in `react/` folder open Cypress testing browser
 ```sh
 cd react/
 npx cypress open
 ```
-and click on spec login.cy.ts in production folder. After running tests bring down docker stack using docker compose down
+and click on spec login.cy.ts in `production` folder. After running tests bring down docker stack using `docker compose down`
 
-start your local dev environment run again
+start your local dev environment and run again
 ```sh
 npx cypress open
 ```
@@ -95,7 +77,7 @@ and click on spec login.cy.ts in local-dev folder
 
 There are videos in folder `react/cypress/videos` and screenshots in `react/cypress/screenshots` 
 
-### cURL calls against API
+### usefull cURL calls against API
 
 POSTing wrong username and password
 
