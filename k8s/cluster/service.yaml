@@ -3,16 +3,12 @@ kind: Service
 metadata:
   name: react-service
 spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
   selector:
     app: react-express-api
-  ports:
-  - name: backend
-    port: 4000
-    targetPort: 4000
-  - name: fronend
-    port: 80
-    targetPort: 80
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service

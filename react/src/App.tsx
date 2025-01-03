@@ -16,14 +16,14 @@ import { axiosClient } from './axiosClient';
 import { AxiosResponse } from 'axios';
 
 function App() {
-  const [podInfo, setPodInfo] = useState("")
+  const [podInfo, setPodInfo] = useState("ini")
 
   useEffect(() => {
     const getData = async () => {
       try {
         const res: AxiosResponse = await axiosClient.get("/pod");
         console.log(res.data.pod)
-        setPodInfo(res.data.pod)
+        setPodInfo(res.data)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.log(error);
@@ -47,7 +47,7 @@ function App() {
             </Routes>
           </Router>
         </AuthProvider>
-      </div >
+      </div>
       <ToastContainer />
     </>
   )
