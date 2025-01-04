@@ -1,6 +1,7 @@
 # Full Stack
 
-Express API server & React TypeScript on local dev environment, Docker stack and in Kubernetes cluster. 
+Express API server & React TypeScript on local dev environment, Docker stack and in Kubernetes cluster.
+ 
 Features: 
 - JWT access & refresh tokens 
 - HTTP only cookies
@@ -25,9 +26,7 @@ docker compose -f docker-compose-prod.yaml up
 
 ### Deployment of production on Kubernetes
 
-in project root folder
-
-build and push images
+in project root folder build and push images
 
 ```sh
 docker build -t <YOUR-DOCKER-HUB-USERNAME>/server:latest server/
@@ -40,8 +39,8 @@ docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
 run deployment and services:
 
 ```sh
-kubectl apply -f k8s/cluster/deployment.yaml
-kubectl apply -f k8s/cluster/service.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
 ```
 
 this lists resouces that need to be deleted during clean up
@@ -54,7 +53,7 @@ kubectl get deployments
 
 ### Reading Express log
 
-exec into Express server container and you can monitor HTTP traffic log in real time
+exec into Express server container and you can monitor HTTP traffic in real time
 
 ```sh
 tail -f access-node.log
@@ -67,15 +66,15 @@ bring up docker stack using `docker compose up` and in `react/` folder open Cypr
 cd react/
 npx cypress open
 ```
-and click on spec login.cy.ts in `production` folder. After running tests bring down docker stack using `docker compose down`
+and click on spec `login.cy.ts` in `production/` folder. After running tests bring down docker stack using `docker compose down`
 
-start your local dev environment and run again
+start your local dev environment and run again and
 ```sh
 npx cypress open
 ```
-and click on spec login.cy.ts in local-dev folder
+and click on spec `login.cy.ts` in `local-dev` folder
 
-There are videos in folder `react/cypress/videos` and screenshots in `react/cypress/screenshots` 
+There are videos in folder `react/cypress/videos/` and screenshots in `react/cypress/screenshots/` 
 
 ### usefull cURL calls against API
 
