@@ -16,16 +16,15 @@ import { axiosClient } from './axiosClient';
 import { AxiosResponse } from 'axios';
 
 function App() {
-  const [podInfo, setPodInfo] = useState("ini")
+  const [hostInfo, setHostInfo] = useState("")
 
   useEffect(() => {
     const getData = async () => {
       try {
         const res: AxiosResponse = await axiosClient.get("/pod");
         console.log(res.data.pod)
-        setPodInfo(res.data)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
+        setHostInfo(res.data)
+      } catch (error: unknown) {
         console.log(error);
       }
     };
@@ -34,7 +33,7 @@ function App() {
   return (
     <>
       <div className="App">
-        <p>{JSON.stringify(podInfo)}</p>
+        <p>{JSON.stringify(hostInfo)}</p>
         <AuthProvider>
           <Router>
             <NavBar />
