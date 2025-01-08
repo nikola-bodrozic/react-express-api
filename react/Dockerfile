@@ -1,16 +1,18 @@
-FROM node:alpine AS builder
+FROM node:alpine3.20 AS builder
 
 WORKDIR /app
 
-COPY package*.json .
+COPY package.json .
 
-RUN npm install
+COPY yarn.lock .
+
+RUN yarn
 
 COPY . .
 
-RUN npm run build
+RUN yarn run build
 
-FROM nginx:alpine
+FROM nginx:alpine3.20
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
