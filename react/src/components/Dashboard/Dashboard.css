@@ -1,0 +1,12 @@
+.pieHolder {
+    width: 45%;
+    margin: 10px;
+    border: 1px solid black
+}
+
+.pieCluster {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  

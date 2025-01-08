@@ -1,17 +1,13 @@
 FROM node:alpine
 
-RUN apk add --no-cache yarn
-
 WORKDIR /usr/src/app
 
-COPY package.json .
+COPY package*.json .
 
-COPY yarn.lock .
-
-RUN yarn install --production
+RUN npm install --production
 
 COPY . .
 
 EXPOSE 4000
 
-CMD ["yarn","start"]
+CMD ["npm","run","start:prod"]

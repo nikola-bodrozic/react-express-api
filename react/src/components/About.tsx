@@ -1,13 +1,32 @@
-// About.tsx
 import React from 'react';
-
+import { useEffect, useState } from 'react';
+import { axiosClient } from '../axiosClient';
+import { AxiosResponse } from 'axios';
 const About: React.FC = () => {
-    return (
-        <div>
-            <h2>About</h2>
-            <p>About Page!</p>
-        </div>
-    );
+  const [hostInfo, setHostInfo] = useState("")
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res: AxiosResponse = await axiosClient.get("/pod", {
+          withCredentials: false,
+          timeout: 3000
+        });
+        console.log(res.data.pod)
+        setHostInfo(res.data.hostname)
+      } catch (error: unknown) {
+        console.log(error);
+      }
+    };
+    getData();
+  }, []);
+  return (
+    <div>
+      <h2>About</h2>
+      <p>Environment: <b>{process.env.NODE_ENV?.toUpperCase()}</b>, App Version: <b>{import.meta.env.VITE_APP_VER}</b></p>
+      <p>Frontend Host: <b>{hostInfo}</b></p>
+    </div>
+  );
 };
 
 export default About;

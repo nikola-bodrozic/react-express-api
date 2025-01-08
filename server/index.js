@@ -97,9 +97,8 @@ app.get(baseUrl + "/health", (req, res) => {
 });
 
 app.get(baseUrl + "/pod", (req, res) => {
-  console.log("nb",os.hostname(), process.env.POD_NAME, process.env.POD_NAMESPACE)
   const pod = {
-    hostname: os.hostname()
+    hostname: os.hostname() || "no info about host name"
   }
   res.json(pod);
 });
@@ -164,22 +163,39 @@ app.delete(baseUrl + "/logout", (req, res) => {
   res.json({ msg: "HTTP-only tokens has been removed!" });
 });
 
-app.get(baseUrl + "/dashboard", authenticateToken,(req, res) => {
+app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
+  const pieDataArr = []
+  const pd1 = {
+    labels: ["Customer", "Business"],
+    datasets: [
+      {
+        data: [12, 29],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  }
+  const pd2 = {
+    labels: ["Transport", "Packaging"],
+    datasets: [
+      {
+        data: [45, 29],
+        backgroundColor: [
+          '#4BC0C0', '#9966FF'
+        ],
+        borderWidth: 1,
+      },
+    ],
+  }
+  pieDataArr.push(pd1)
+  pieDataArr.push(pd2)
+
   res.json({
     message: "welcome to dasboard",
-    pieData: {
-      labels: ["Customer", "Business"],
-      datasets: [
-        {
-          data: [12, 29],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-          ],
-          borderWidth: 1,
-        },
-      ],
-    },
+    pieDataArr,
   });
 });
 

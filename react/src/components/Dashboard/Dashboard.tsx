@@ -1,6 +1,7 @@
+import './Dashboard.css'
 import { AxiosResponse } from "axios";
 import React, { useEffect, useState } from "react";
-import { axiosClient } from "../axiosClient";
+import { axiosClient } from "../../axiosClient";
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -24,7 +25,7 @@ interface IData {
 const Dashboard: React.FC = () => {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [pieData, setPieData] = useState<IData | null>(null);
+  const [pieDataArr, setPieDataArr] = useState<IData[] | null>(null);
 
   useEffect(() => {
     const getData = async () => {
@@ -32,7 +33,7 @@ const Dashboard: React.FC = () => {
         const res: AxiosResponse = await axiosClient.get("/dashboard");
         setMsg(res.data.message);
         setIsLoading(false);
-        setPieData(res.data.pieData);
+        setPieDataArr(res.data.pieDataArr);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.log(error);
@@ -42,6 +43,7 @@ const Dashboard: React.FC = () => {
     getData();
   }, []);
 
+
   return isLoading ? (
     <>
       <p>Loding...</p>
@@ -49,8 +51,8 @@ const Dashboard: React.FC = () => {
   ) : (
     <>
       <p id="msg">{msg}</p>
-      <div style={{ border: "1px solid black", margin: "20px", padding: "5px" }}>
-        <Pie id="pie" data={pieData as IData} width={"80%"} options={{ maintainAspectRatio: false }} />
+      <div className='pieCluster'>
+        {pieDataArr?.map((pieData: IData, index: number) => <div className="pieHolder"><Pie id={`pie${index}`} data={pieData} width={"80%"} options={{ maintainAspectRatio: false }} /></div>)}
       </div>
     </>
   );
