@@ -1,13 +1,17 @@
 FROM node:alpine
 
+RUN apk update && apk add --no-cache python3 py3-pip make g++ yarn
+
 WORKDIR /usr/src/app
 
-COPY package*.json .
+COPY package.json .
 
-RUN npm install --production
+COPY yarn.lock .
+
+RUN yarn install --production
 
 COPY . .
 
 EXPOSE 4000
 
-CMD ["npm","run","start:prod"]
+CMD ["yarn","run","start:prod"]
