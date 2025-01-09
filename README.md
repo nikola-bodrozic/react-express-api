@@ -13,8 +13,8 @@ in `server/` folder rename `.env.sample` to `.env` file  and set values for ACCE
 
 ### Deployment in Local Environment
 
-In `react/` folders install dependancies with `npm install` and start the React app with `npm run dev`.
-Install dependencies in `server/` folder with `yarn` and use `npm run dev` to start the API server. 
+In `react/` folders install dependancies with `yarn` and start the React app with `yarn run dev`.
+Install dependencies in `server/` folder with `yarn` and use `yarn run dev` to start the API server. 
 
 ### Deployment of production using Docker Compose
 
@@ -61,7 +61,7 @@ tail -f access-node.log
 
 ### Running Cypress tests
 
-start your local dev environment and run
+start only react app, response from API is mocked
 
 ```sh
 yarn cypress open
@@ -75,7 +75,7 @@ yarn e2e:chrome
 
 ### usefull cURL calls against API
 
-POSTing wrong username and password
+POSTing username and password to get tokens
 
 ```sh
 curl -i 'http://localhost:4000/api/v1/login' --no-progress-meter -X POST \
@@ -91,7 +91,7 @@ curl -i 'http://localhost:4000/api/v1/login' --no-progress-meter -X POST \
 -H 'Priority: u=0' \
 -H 'Pragma: no-cache' \
 -H 'Cache-Control: no-cache' \
---data-raw '{"username":"q","password":"q"}'
+--data-raw '{"username":"username1","password":"pass1"}'
 ```
 
 GET protected route
