@@ -1,6 +1,6 @@
 import './Dashboard.css'
-import { AxiosResponse } from "axios";
-import React, { useEffect, useState } from "react";
+import axios, { AxiosResponse } from "axios";
+import { useEffect, useState } from "react";
 import { axiosClient } from "../../axiosClient";
 import { Pie } from "react-chartjs-2";
 import {
@@ -11,33 +11,37 @@ import {
 } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface IDataSet {
+interface IDatasets {
   data: number[];
   backgroundColor: string[];
   borderWidth: number;
 }
 
-interface IData {
-  labels: string[];
-  datasets: IDataSet[];
+interface IPieData {
+  labelers: string[]
+  datasets: IDatasets[]
 }
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [pieDataArr, setPieDataArr] = useState<IData[] | null>(null);
+  const [pieDataArr, setPieDataArr] = useState<IPieData[] | null>(null);
 
   useEffect(() => {
     const getData = async () => {
       try {
         const res: AxiosResponse = await axiosClient.get("/dashboard");
         setMsg(res.data.message);
-        setIsLoading(false);
         setPieDataArr(res.data.pieDataArr);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.log(error);
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          console.log(error.status, error.message)
+        } else {
+          console.error(error);
+        }
         setMsg("API is down");
+      } finally {
+        setIsLoading(false);
       }
     };
     getData();
@@ -50,7 +54,7 @@ const Dashboard: React.FC = () => {
     <>
       <p id="msg">{msg}</p>
       <div className='pies'>
-        {pieDataArr?.map((pieData: IData, index: number) => <div key={`holder${index}`} className="pieHolder"><Pie id={`pie${index}`} data={pieData} width={"80%"} options={{ maintainAspectRatio: false }} /></div>)}
+        {pieDataArr?.map((pieData: IPieData, index: number) => <div key={`holder${index}`} className="pieHolder"><Pie id={`pie${index}`} data={pieData} width={"80%"} options={{ maintainAspectRatio: false }} /></div>)}
       </div>
     </>
   );
