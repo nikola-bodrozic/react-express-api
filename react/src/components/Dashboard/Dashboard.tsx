@@ -53,8 +53,8 @@ const Dashboard = () => {
           console.error('Request canceled:', error.message);
         } else {
           console.error('Request failed:', error);
+          setMsg("API is down");
         }
-        setMsg("API is down");
       } finally {
         setIsLoading(false);
       }
