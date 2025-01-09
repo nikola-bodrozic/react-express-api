@@ -1,7 +1,6 @@
 import './Dashboard.css'
 import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
-import { axiosClient } from "../../axiosClient";
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,6 +9,8 @@ import {
   Legend,
 } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
+import axiosRetry from 'axios-retry';
+import { axiosConfig } from '../../axiosClient';
 
 interface IDatasets {
   data: number[];
@@ -22,34 +23,53 @@ interface IPieData {
   datasets: IDatasets[]
 }
 
+axiosRetry(axios, {
+  retries: 5,
+  retryDelay: (retryCount) => {
+    console.log(`Retry attempt: ${retryCount}`);
+    return 1000;
+  },
+  retryCondition: (error) => {
+    return axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error);
+  },
+});
+
 const Dashboard = () => {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [pieDataArr, setPieDataArr] = useState<IPieData[] | null>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     const getData = async () => {
       try {
-        const res: AxiosResponse = await axiosClient.get("/dashboard");
+        const res: AxiosResponse = await axios.get(`${axiosConfig.baseURL}/dashboard`, { signal, withCredentials: axiosConfig.withCredentials });
         setMsg(res.data.message);
         setPieDataArr(res.data.pieDataArr);
       } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-          console.log(error.status, error.message)
+        if (axios.isCancel(error)) {
+          console.error('Request canceled:', error.message);
         } else {
-          console.error(error);
+          console.error('Request failed:', error);
         }
         setMsg("API is down");
       } finally {
         setIsLoading(false);
       }
     };
+
     getData();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
 
   return isLoading ? (
-    <p id="dashLoader">Loding...</p>
+    <p id="dashLoader">Loading...</p>
   ) : (
     <>
       <p id="msg">{msg}</p>

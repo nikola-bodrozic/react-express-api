@@ -164,6 +164,8 @@ app.delete(baseUrl + "/logout", (req, res) => {
 });
 
 app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
+  // for testing purpose
+  // return res.status(500).send("failed")
   const pieDataArr = []
   const pd1 = {
     labels: ["Customer", "Business"],
@@ -192,7 +194,6 @@ app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
   }
   pieDataArr.push(pd1)
   pieDataArr.push(pd2)
-
   res.json({
     message: "welcome to dasboard",
     pieDataArr,
