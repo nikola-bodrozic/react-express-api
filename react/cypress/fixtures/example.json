@@ -1,5 +1,46 @@
 {
-  "name": "Using fixtures to represent data",
-  "email": "hello@cypress.io",
-  "body": "Fixtures are a great way to mock data for responses to routes"
+  "hostInfo": {
+      "statusCode": 200,
+      "body": {
+          "hostname": "testHost"
+      }
+  },
+  "dashBoardInfo":{
+    "statusCode": 200,
+    "body": {
+      "message": "welcome to dasboard",
+      "pieDataArr": [{
+        "labels": ["test1", "test2"],
+        "datasets": [
+          {
+            "data": [12, 29],
+            "backgroundColor": [
+              "rgba(255, 99, 132)",
+              "rgba(54, 162, 235)"
+            ],
+            "borderWidth": 1
+          }
+        ]
+      }, {
+        "labels": ["test3", "test4"],
+        "datasets": [
+          {
+            "data": [45, 29],
+            "backgroundColor": [
+              "rgba(255, 0, 0)",
+              "rgba(0, 0, 211)"
+            ],
+            "borderWidth": 1
+          }
+        ]
+      }]
+    }
+  },
+  "loginInfo":{
+    "statusCode": 200,
+    "body": {
+      "msg": "Login successful",
+      "user": { "id": 1, "name": "Name 1", "username": "username1" }
+    }
+  }
 }

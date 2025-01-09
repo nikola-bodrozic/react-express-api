@@ -1,50 +1,36 @@
 /// <reference types="cypress" />
 describe("Login Test", () => {
-  const base = "http://localhost:";
-  const apiBaseURL = `${base}4000/api/v1`;
-  const reactBaseURL = `${base}5173/`;
+  const baseURL = "http://localhost";
+  const apiBaseURL = `${baseURL}:4000/api/v1`;
+  const reactBaseURL = `${baseURL}:5173/`
 
   beforeEach(() => {
+    // load fixturess
+    cy.fixture("example").then((data) => {
+      this.data = data;
+    })
     cy.visit(reactBaseURL);
-    cy.get("#about").click();
-    cy.url().should("include", "/about");
-    cy.get("#dashboard").click();
-    cy.url().should("include", "/login");
   });
-
+  
   afterEach(() => {
     cy.wait(2000);
   });
-
+  
   it("should log in with valid credentials and show dasboard", () => {
-    cy.intercept("POST", `${apiBaseURL}/login`, {
-      statusCode: 200,
-      body: {
-        msg: "Login successful",
-        user: { id: 1, name: "Name 1", username: "username1" },
-      },
-    }).as("postData");
-
-    cy.intercept("GET", `${apiBaseURL}/dashboard`, {
-      statusCode: 200,
-      body: {
-        message: "welcome to dasboard",
-        pieData: {
-          labels: ["Customer", "Business"],
-          datasets: [
-            {
-              data: [12, 29],
-              backgroundColor: [
-                "rgba(255, 99, 132, 0.2)",
-                "rgba(54, 162, 235, 0.2)",
-              ],
-              borderWidth: 1,
-            },
-          ],
-        },
-      },
-    }).as("getData");
-
+    console.log(process.env.NODE_ENV)
+    cy.intercept("POST", `${apiBaseURL}/login`, this.data.loginInfo).as("postData");
+    cy.intercept("GET", `${apiBaseURL}/dashboard`, this.data.dashBoardInfo).as("getData");
+    cy.intercept("GET", `${apiBaseURL}/pod`, this.data.hostInfo).as("getHostInfo")
+    cy.get("#about").click();
+    cy.url().should("include", "/about");
+    cy.wait("@getHostInfo").then((interception) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      interception.response &&
+        expect(interception.response.statusCode).to.equal(200);
+    });
+    cy.wait(3000)
+    cy.get("#dashboard").click();
+    cy.url().should("include", "/login");
     cy.get('input[name="username"]').type("username1");
     cy.get('input[name="password"]').type("pass1");
     cy.get('button[type="submit"]').click();
@@ -53,21 +39,23 @@ describe("Login Test", () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&
         expect(interception.response.statusCode).to.equal(200);
-      cy.get("#loader").should("not.exist");
     });
+    cy.get("#loader").should("not.exist");
     cy.wait("@getData").then((interception) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&
         expect(interception.response.statusCode).to.equal(200);
-      cy.url().should("include", "/dashboard");
-      cy.get("#msg").should("contain", "welcome to dasboard");
-      cy.get("#name-holder").should("contain", "Hello Name 1");
-      cy.get("#pie").should("exist");
-      cy.get("#logout").click();
-      cy.get("#pie").should("not.exist");
-      cy.url().should("include", "/");
-      cy.get("#login").should("contain", "Login");
     });
+    cy.url().should("include", "/dashboard");
+    cy.get("#msg").should("contain", "welcome to dasboard");
+    cy.get("#name-holder").should("contain", "Hello Name 1");
+    cy.get(".pies").should("exist");
+    cy.get(".pieHolder").should("have.length", 2);
+    cy.wait(4000)
+    cy.get("#logout").click();
+    cy.get(".pies").should("not.exist");
+    cy.url().should("include", "/");
+    cy.get("#login").should("contain", "Login");
   });
 
   it("should get error message when entering invalid credentials shorter tham 5 chars", () => {
@@ -84,7 +72,8 @@ describe("Login Test", () => {
         ],
       },
     }).as("postData");
-
+    cy.get("#dashboard").click();
+    cy.url().should("include", "/login");
     cy.get('input[name="username"]').type("u1");
     cy.get('input[name="password"]').type("p1");
     cy.get('button[type="submit"]').click();
@@ -93,8 +82,8 @@ describe("Login Test", () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&
         expect(interception.response.statusCode).to.equal(422);
-      cy.get("#loader").should("not.exist");
     });
+    cy.get("#loader").should("not.exist");
     cy.get("#error").children().should("have.length.greaterThan", 0);
     cy.get("#error .err-item")
       .first()
@@ -115,7 +104,8 @@ describe("Login Test", () => {
         ],
       },
     }).as("postData");
-
+    cy.get("#dashboard").click();
+    cy.url().should("include", "/login");
     cy.get('input[name="username"]').type("wrong-username");
     cy.get('input[name="password"]').type("wrong-password");
     cy.get('button[type="submit"]').click();
@@ -124,8 +114,8 @@ describe("Login Test", () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       interception.response &&
         expect(interception.response.statusCode).to.equal(422);
-      cy.get("#loader").should("not.exist");
     });
+    cy.get("#loader").should("not.exist");
     cy.get("#error").children().should("have.length.greaterThan", 0);
     cy.get("#error .err-item")
       .first()

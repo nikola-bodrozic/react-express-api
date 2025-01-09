@@ -45,14 +45,12 @@ const Dashboard: React.FC = () => {
 
 
   return isLoading ? (
-    <>
-      <p>Loding...</p>
-    </>
+    <p id="dashLoader">Loding...</p>
   ) : (
     <>
       <p id="msg">{msg}</p>
-      <div className='pieCluster'>
-        {pieDataArr?.map((pieData: IData, index: number) => <div className="pieHolder"><Pie id={`pie${index}`} data={pieData} width={"80%"} options={{ maintainAspectRatio: false }} /></div>)}
+      <div className='pies'>
+        {pieDataArr?.map((pieData: IData, index: number) => <div key={`holder${index}`} className="pieHolder"><Pie id={`pie${index}`} data={pieData} width={"80%"} options={{ maintainAspectRatio: false }} /></div>)}
       </div>
     </>
   );

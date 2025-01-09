@@ -61,20 +61,17 @@ tail -f access-node.log
 
 ### Running Cypress tests
 
-bring up docker stack using `docker compose up` and in `react/` folder open Cypress testing browser
-```sh
-cd react/
-npx cypress open
-```
-and click on spec `login.cy.ts` in `production/` folder. After running tests bring down docker stack using `docker compose down`
+start your local dev environment and run
 
-start your local dev environment and run again and
 ```sh
-npx cypress open
-```
-and click on spec `login.cy.ts` in `local-dev` folder
+yarn cypress open
+``` 
 
-There are videos in folder `react/cypress/videos/` and screenshots in `react/cypress/screenshots/` 
+for headless browser
+
+```sh
+yarn e2e:chrome
+``` 
 
 ### usefull cURL calls against API
 

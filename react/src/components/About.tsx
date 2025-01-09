@@ -12,7 +12,6 @@ const About: React.FC = () => {
           withCredentials: false,
           timeout: 3000
         });
-        console.log(res.data.pod)
         setHostInfo(res.data.hostname)
       } catch (error: unknown) {
         console.log(error);
