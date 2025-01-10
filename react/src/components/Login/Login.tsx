@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./Login.css";
 import { useAuth } from "../../AuthContext";
 import { useNavigate } from "react-router-dom";
-import axios from "../../axiosConfig.js";
+import axios from "../../axiosConfig";
 import { toast } from "react-toastify";
 import Loader from "react-js-loader";
 

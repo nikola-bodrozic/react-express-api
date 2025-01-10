@@ -1,7 +1,7 @@
 import './Dashboard.css'
 import { useEffect, useState } from "react";
 import axiosRetry from 'axios-retry';
-import axios from "../../axiosConfig.js";
+import axios from "../../axiosConfig";
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
