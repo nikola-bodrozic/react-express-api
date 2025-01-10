@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Login.css";
 import { useAuth } from "../../AuthContext";
 import { useNavigate } from "react-router-dom";
-import { axiosClient } from "../../axiosClient";
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import Loader from "react-js-loader";
+import { axiosConfig } from '../../axiosClient';
 
 interface errorMsg {
   type?: string;
@@ -21,15 +21,26 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const signal = controller.signal;
     setIsLoading(true);
     try {
-      const res: AxiosResponse = await axiosClient.post("/login", {
-        username,
-        password,
-      });
+      const res: AxiosResponse = await axios.post(
+        `${axiosConfig.baseURL}/login`,
+        {
+          username,
+          password,
+        },
+        {
+          signal,
+          withCredentials: axiosConfig.withCredentials
+        }
+      );
       renderName(res.data.user.name);
       login();
       toast.success("Logged in successfully!");
@@ -46,6 +57,15 @@ const Login = () => {
       logout();
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        console.log('Request aborted on component unmount');
+      }
+    };
+  }, []);
 
   return isLoading ? (
     <div>
