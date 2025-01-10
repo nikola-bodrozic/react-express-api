@@ -1,6 +1,7 @@
 import './Dashboard.css'
-import axios, { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
+import axiosRetry from 'axios-retry';
+import axios from "../../axiosConfig.js";
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,8 +10,6 @@ import {
   Legend,
 } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
-import axiosRetry from 'axios-retry';
-import { baseURL, withCredentials } from '../../axiosGlobalConfig';
 
 interface IDatasets {
   data: number[];
@@ -45,7 +44,7 @@ const Dashboard = () => {
 
     const getData = async () => {
       try {
-        const res: AxiosResponse = await axios.get(`${baseURL}/dashboard`, { signal, withCredentials });
+        const res = await axios.get("/dashboard", { signal });
         setMsg(res.data.message);
         setPieDataArr(res.data.pieDataArr);
       } catch (error: unknown) {

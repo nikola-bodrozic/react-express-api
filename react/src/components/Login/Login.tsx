@@ -2,10 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import "./Login.css";
 import { useAuth } from "../../AuthContext";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosResponse } from "axios";
+import axios from "../../axiosConfig.js";
 import { toast } from "react-toastify";
 import Loader from "react-js-loader";
-import { baseURL, withCredentials } from '../../axiosGlobalConfig';
 
 interface errorMsg {
   type?: string;
@@ -30,15 +29,14 @@ const Login = () => {
     const signal = controller.signal;
     setIsLoading(true);
     try {
-      const res: AxiosResponse = await axios.post(
-        `${baseURL}/login`,
+      const res = await axios.post(
+        "/login",
         {
           username,
           password,
         },
         {
-          signal,
-          withCredentials
+          signal
         }
       );
       renderName(res.data.user.name);

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { baseURL } from '../axiosGlobalConfig';
+import axios from "../../src/axiosConfig";
 
 const About: React.FC = () => {
   const [hostInfo, setHostInfo] = useState("")
@@ -9,7 +8,7 @@ const About: React.FC = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res: AxiosResponse = await axios.get(`${baseURL}/pod`, {
+        const res = await axios.get("/pod", {
           withCredentials: false,
           timeout: 3000
         });
