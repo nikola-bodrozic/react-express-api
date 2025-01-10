@@ -1,14 +1,15 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { axiosClient } from '../axiosClient';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { baseURL } from '../axiosGlobalConfig';
+
 const About: React.FC = () => {
   const [hostInfo, setHostInfo] = useState("")
 
   useEffect(() => {
     const getData = async () => {
       try {
-        const res: AxiosResponse = await axiosClient.get("/pod", {
+        const res: AxiosResponse = await axios.get(`${baseURL}/pod`, {
           withCredentials: false,
           timeout: 3000
         });
@@ -17,8 +18,10 @@ const About: React.FC = () => {
         console.log(error);
       }
     };
+
     getData();
   }, []);
+
   return (
     <div>
       <h2>About</h2>

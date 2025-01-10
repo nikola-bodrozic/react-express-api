@@ -10,7 +10,7 @@ import {
 } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 import axiosRetry from 'axios-retry';
-import { axiosConfig } from '../../axiosClient';
+import { baseURL, withCredentials } from '../../axiosGlobalConfig';
 
 interface IDatasets {
   data: number[];
@@ -45,7 +45,7 @@ const Dashboard = () => {
 
     const getData = async () => {
       try {
-        const res: AxiosResponse = await axios.get(`${axiosConfig.baseURL}/dashboard`, { signal, withCredentials: axiosConfig.withCredentials });
+        const res: AxiosResponse = await axios.get(`${baseURL}/dashboard`, { signal, withCredentials });
         setMsg(res.data.message);
         setPieDataArr(res.data.pieDataArr);
       } catch (error: unknown) {

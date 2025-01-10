@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import Loader from "react-js-loader";
-import { axiosConfig } from '../../axiosClient';
+import { baseURL, withCredentials } from '../../axiosGlobalConfig';
 
 interface errorMsg {
   type?: string;
@@ -31,14 +31,14 @@ const Login = () => {
     setIsLoading(true);
     try {
       const res: AxiosResponse = await axios.post(
-        `${axiosConfig.baseURL}/login`,
+        `${baseURL}/login`,
         {
           username,
           password,
         },
         {
           signal,
-          withCredentials: axiosConfig.withCredentials
+          withCredentials
         }
       );
       renderName(res.data.user.name);
