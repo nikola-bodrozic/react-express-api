@@ -42,9 +42,19 @@ run deployment and services:
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 ```
+once services and deplyments are up you can test API:
+```sh
+curl http://localhost:4000/api/v1
+```
+for react open browser [http://localhost](http://localhost)
+
+inside react container you can ping server conatiner 
+```sh
+curl http://server-service:4000/api/v1
+```
+
 
 this lists resouces that need to be deleted during clean up
-
 ```sh
 kubectl get svc
 kubectl get pods
