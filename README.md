@@ -71,7 +71,7 @@ tail -f access-node.log
 
 ### Running Cypress tests
 
-start only react app, response from API is mocked
+start only react app, response from API is mocked. In react folder
 
 ```sh
 yarn cypress open
