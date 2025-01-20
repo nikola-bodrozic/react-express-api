@@ -4,8 +4,6 @@ services:
     build: ./server
     ports:
       - "4000:4000"
-    volumes:
-      - ./server:/usr/src/app
     environment:
       - NODE_ENV=production
     healthcheck:
@@ -18,15 +16,8 @@ services:
     build: ./react
     ports:
       - "80:80"
-    volumes:
-      - ./react:/app
     environment:
       - NODE_ENV=production
       - VITE_APP_VER=1.0.0
     depends_on:
       - server
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5

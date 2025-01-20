@@ -2,13 +2,13 @@ FROM node:alpine3.20
 
 RUN apk update && apk add --no-cache python3 py3-pip make g++ yarn
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package.json .
 
 COPY yarn.lock .
 
-RUN yarn install
+RUN yarn
 
 COPY . .
 
