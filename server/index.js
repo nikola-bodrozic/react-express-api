@@ -1,12 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const morganBody = require("morgan-body");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-const fs = require("fs");
-const os = require("os")
-const path = require("path");
+const os = require("os");
 const sqlite3 = require("sqlite3").verbose();
 const constants = require("./constants");
 const { validationResult } = require("express-validator");
@@ -14,49 +11,34 @@ const { validateLogin } = require("./validateLogin");
 
 dotenv.config();
 
-// path to log file
-const filePath = path.join(__dirname, "access-node.log");
-// delete old log file if it exists
-fs.access(filePath, fs.constants.F_OK, (err) => {
-  if (err) {
-    console.log("Log file does not exist. Will be created on first API call");
-  } else {
-    fs.unlink(filePath, () => {
-      console.log("Old log file deleted successfully.");
-    });
-  }
-});
-
-const accessLogStream = fs.createWriteStream(filePath, { flags: "a" });
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 
-// initialise in memory database
+// create in memory database and 2 tables
 const db = new sqlite3.Database(":memory:");
-// populate database
 db.serialize(() => {
   db.run(
     "CREATE TABLE IF NOT EXISTS users ( ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, USERNAME TEXT NOT NULL, PASSWORD CHAR(50));"
   );
-  const stmt = db.prepare(
+  let stmt = db.prepare(
     "INSERT INTO users (name, username, password) VALUES (?, ?, ?);"
   );
   for (let i = 1; i <= 3; i++) {
     stmt.run(`Name ${i}`, `username${i}`, `pass${i}`);
   }
   stmt.finalize();
+  stmt = null;
+  db.run(
+    "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, post TEXT NOT NULL, username CHAR(50) NOT NULL);"
+  );
+  stmt = db.prepare("INSERT INTO items (post, username) VALUES (?, ?);");
+  for (let i = 1; i <= 50; i++) {
+    stmt.run(`Post ${i} some text`, `username${i}`);
+  }
+  stmt.finalize();
 });
-
-morganBody(app, {
-  stream: accessLogStream,
-  noColors: true,
-  logAllReqHeader: true,
-  logAllResHeader: true,
-});
-// or
-// morganBody(app, { stream: accessLogStream, noColors: true });
 
 const baseUrl = "/api/v1";
 const refreshTokens = [];
@@ -88,7 +70,7 @@ function authenticateToken(req, res, next) {
 
 function renderTimeStamp() {
   const date = new Date();
-  return `${date.getHours()}:${date.getMinutes()}:${date.getMilliseconds()}`;
+  return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
 }
 
 app.get(baseUrl + "/health", (req, res) => {
@@ -98,8 +80,8 @@ app.get(baseUrl + "/health", (req, res) => {
 
 app.get(baseUrl + "/pod", (req, res) => {
   const pod = {
-    hostname: os.hostname() || "no info about host name"
-  }
+    hostname: os.hostname() || "no info about host name",
+  };
   res.json(pod);
 });
 
@@ -109,8 +91,6 @@ app.get(baseUrl + "/", (req, res) => {
 });
 
 app.post(baseUrl + "/login", validateLogin, (req, res) => {
-  // setTimeout to see loader in Login.tsx
-  // setTimeout(()=>{
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
@@ -142,7 +122,6 @@ app.post(baseUrl + "/login", validateLogin, (req, res) => {
       res.status(403).json({ msg: "Bad username or password" });
     }
   );
-  // }, 1500)
 });
 
 app.post(baseUrl + "/token", (req, res) => {
@@ -164,40 +143,60 @@ app.delete(baseUrl + "/logout", (req, res) => {
 });
 
 app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
-  // for testing purpose
-  // return res.status(500).send("failed")
-  const pieDataArr = []
+  const pieDataArr = [];
   const pd1 = {
     labels: ["Customer", "Business"],
     datasets: [
       {
         data: [12, 29],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-        ],
+        backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)"],
         borderWidth: 1,
       },
     ],
-  }
+  };
   const pd2 = {
     labels: ["Transport", "Packaging"],
     datasets: [
       {
         data: [45, 29],
-        backgroundColor: [
-          '#4BC0C0', '#9966FF'
-        ],
+        backgroundColor: ["#4BC0C0", "#9966FF"],
         borderWidth: 1,
       },
     ],
-  }
-  pieDataArr.push(pd1)
-  pieDataArr.push(pd2)
+  };
+  pieDataArr.push(pd1);
+  pieDataArr.push(pd2);
   res.json({
     message: "welcome to dasboard",
     pieDataArr,
   });
+});
+app.get(baseUrl + "/table", async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Get page number from query, default to 1
+  const pageSize = parseInt(req.query.pageSize) || 10; // Get page size from query, default to 10
+  const offset = (page - 1) * pageSize;
+
+  db.all(
+    "SELECT * FROM items LIMIT ? OFFSET ?",
+    [pageSize, offset],
+    async (err, rows) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      if (rows.length) {
+        const totalItems = await getTotalRowsCount("items");
+        const totalPages = Math.ceil(totalItems / pageSize);
+        res.json({
+          items: rows,
+          totalItems,
+          totalPages,
+          currentPage: page,
+          pageSize,
+        });
+      }
+    }
+  );
 });
 
 app.get(baseUrl + "/clear", (req, res) => {
@@ -213,6 +212,17 @@ function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 }
 
+function getTotalRowsCount(tableName) {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT COUNT(*) as count FROM ${tableName}`, (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row.count);
+      }
+    });
+  });
+}
 app.listen(port, () => {
   console.log("Authentication service started on port " + port);
 });
