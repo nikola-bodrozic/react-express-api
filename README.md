@@ -1,6 +1,6 @@
 # Full Stack
 
-Express API server & React TypeScript on local dev environment, Docker stack and in Kubernetes cluster.
+Express API server & React TypeScript
  
 Features: 
 - JWT access & refresh tokens 
@@ -16,71 +16,18 @@ in `server/` folder rename `.env.sample` to `.env` file  and set values for ACCE
 In `react/` folders install dependancies with `yarn` and start the React app with `yarn run dev`.
 Install dependencies in `server/` folder with `yarn` and use `yarn run dev` to start the API server. 
 
-### Deployment of production using Docker Compose
-
-in root folder:
-
-```sh
-docker compose -f docker-compose-prod.yaml up
-```
-
-### Deployment of production on Kubernetes
-
-in project root folder build and push images
-
-```sh
-docker build -t <YOUR-DOCKER-HUB-USERNAME>/server:latest server/
-docker push <YOUR-DOCKER-HUB-USERNAME>/server:latest
-
-docker build -t <YOUR-DOCKER-HUB-USERNAME>/react:latest react/
-docker push <YOUR-DOCKER-HUB-USERNAME>/react:latest
-```
-
-run deployment and services:
-
-```sh
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-```
-once services and deplyments are up you can test API:
-```sh
-curl http://localhost:4000/api/v1
-```
-for react open browser [http://localhost](http://localhost)
-
-inside react container you can ping server conatiner 
-```sh
-curl http://server-service:4000/api/v1
-```
-
-
-this lists resouces that need to be deleted during clean up
-```sh
-kubectl get svc
-kubectl get pods
-kubectl get deployments
-```
-
-### Reading Express log
-
-exec into Express server container and you can monitor HTTP traffic in real time
-
-```sh
-tail -f access-node.log
-```
-
 ### Running Cypress tests
 
 start only react app, response from API is mocked. In react folder
 
+for headless browser
 ```sh
-yarn cypress open
+yarn e2e
 ``` 
 
-for headless browser
-
+for Cypress GUI
 ```sh
-yarn e2e:chrome
+yarn e2e:gui
 ``` 
 
 ### usefull cURL calls against API
