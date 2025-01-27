@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const os = require("os");
 const sqlite3 = require("sqlite3").verbose();
-const constants = require("./constants");
+const { loginMessage, pd1, pd2 } = require("./constants");
 const { validationResult } = require("express-validator");
 const { validateLogin } = require("./validateLogin");
 
@@ -117,7 +117,7 @@ app.post(baseUrl + "/login", validateLogin, (req, res) => {
         refreshTokens.push(refreshToken);
         res.cookie("accessToken", accessToken, { httpOnly: true });
         res.cookie("refreshToken", refreshToken, { httpOnly: true });
-        return res.status(200).json({ msg: constants.LOGIN_MESSAGE, user });
+        return res.status(200).json({ msg: loginMessage, user });
       }
       res.status(403).json({ msg: "Bad username or password" });
     }
@@ -144,26 +144,7 @@ app.delete(baseUrl + "/logout", (req, res) => {
 
 app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
   const pieDataArr = [];
-  const pd1 = {
-    labels: ["Customer", "Business"],
-    datasets: [
-      {
-        data: [12, 29],
-        backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)"],
-        borderWidth: 1,
-      },
-    ],
-  };
-  const pd2 = {
-    labels: ["Transport", "Packaging"],
-    datasets: [
-      {
-        data: [45, 29],
-        backgroundColor: ["#4BC0C0", "#9966FF"],
-        borderWidth: 1,
-      },
-    ],
-  };
+
   pieDataArr.push(pd1);
   pieDataArr.push(pd2);
   res.json({
