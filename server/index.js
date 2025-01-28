@@ -7,7 +7,7 @@ const os = require("os");
 const sqlite3 = require("sqlite3").verbose();
 const { loginMessage, pd1, pd2 } = require("./constants");
 const { validationResult } = require("express-validator");
-const { validateLogin } = require("./validateLogin");
+const { validateLogin, renderTimeStamp } = require("./utils");
 
 dotenv.config();
 
@@ -45,9 +45,9 @@ const refreshTokens = [];
 const port = 4000;
 
 let origin = "http://localhost";
-console.log("----environment----", process.env.NODE_ENV);
-if (process.env.NODE_ENV === "development") origin = origin + ":5173";
-console.log("----origin----", origin);
+console.log("environment:", process.env.NODE_ENV);
+if (process.env.NODE_ENV.toLowerCase() === "development") origin = origin + ":5173";
+console.log("origin for CORS:", origin);
 
 app.use(
   cors({
@@ -66,11 +66,6 @@ function authenticateToken(req, res, next) {
       next();
     }
   );
-}
-
-function renderTimeStamp() {
-  const date = new Date();
-  return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
 }
 
 app.get(baseUrl + "/health", (req, res) => {
@@ -96,6 +91,7 @@ app.post(baseUrl + "/login", validateLogin, (req, res) => {
     return res.status(422).json({ errors: errors.array() });
   }
   const { username, password } = req.body;
+
   db.all(
     "SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1",
     [username, password],
@@ -144,14 +140,14 @@ app.delete(baseUrl + "/logout", (req, res) => {
 
 app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
   const pieDataArr = [];
-
   pieDataArr.push(pd1);
   pieDataArr.push(pd2);
   res.json({
-    message: "welcome to dasboard",
+    message: "welcome to dashboard",
     pieDataArr,
   });
 });
+
 app.get(baseUrl + "/table", async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Get page number from query, default to 1
   const pageSize = parseInt(req.query.pageSize) || 10; // Get page size from query, default to 10
@@ -204,6 +200,7 @@ function getTotalRowsCount(tableName) {
     });
   });
 }
+
 app.listen(port, () => {
-  console.log("Authentication service started on port " + port);
+  console.log(`API service started on port ${port}, API base url is ${baseUrl}`);
 });

@@ -8,4 +8,11 @@ const validateLogin = [
   check('password').isLength({ min: passwordLen }).withMessage(`Password must be at least ${passwordLen} characters long`),
 ];
 
-exports.validateLogin = validateLogin;
+
+function renderTimeStamp() {
+  const date = new Date();
+  return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
+}
+
+module.exports = { validateLogin, renderTimeStamp }
+

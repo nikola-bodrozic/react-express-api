@@ -30,6 +30,10 @@ for Cypress GUI
 yarn e2e:gui
 ``` 
 
+select E2E testing, choose browser and click on `login-fixtures.cy.ts`
+
+In rare casess you need to test using live API - select `login-live-api.cy.ts`
+
 ### usefull cURL calls against API
 
 POSTing username and password to get tokens
@@ -51,7 +55,7 @@ curl -i 'http://localhost:4000/api/v1/login' --no-progress-meter -X POST \
 --data-raw '{"username":"username1","password":"pass1"}'
 ```
 
-GET protected route
+GET protected route add accessToken and refereshToken from previous POST call
 ```sh
 curl 'http://localhost:4000/api/v1/dashboard' --no-progress-meter \
 -H 'Accept: application/json, text/plain, */*' \

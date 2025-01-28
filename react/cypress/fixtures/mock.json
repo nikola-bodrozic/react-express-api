@@ -1,4 +1,5 @@
 {
+  "welcome": "welcome to dashboard",
   "hostInfo": {
       "statusCode": 200,
       "body": {
@@ -8,7 +9,7 @@
   "dashBoardInfo":{
     "statusCode": 200,
     "body": {
-      "message": "welcome to dasboard",
+      "message": "welcome to dashboard",
       "pieDataArr": [{
         "labels": ["test1", "test2"],
         "datasets": [
@@ -42,5 +43,22 @@
       "msg": "Login successful",
       "user": { "id": 1, "name": "Name 1", "username": "username1" }
     }
+  },
+  "shortCreds":{
+    "errors": [
+      {
+        "msg": "test Username must be at least 5 characters long"
+      },
+      {
+        "msg": "test Password must be at least 5 characters long"
+      }
+    ]
+  },
+  "badCreds":{
+    "errors": [
+      {
+        "msg": "test bad username/password"
+      }
+    ]
   }
 }
