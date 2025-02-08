@@ -1,48 +1,19 @@
-const express = require("express");
+const express = require('express');
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
-const cookieParser = require("cookie-parser");
-const os = require("os");
-const sqlite3 = require("sqlite3").verbose();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { loginMessage, pd1, pd2 } = require("./constants");
-const { validationResult } = require("express-validator");
-const { validateLogin, renderTimeStamp } = require("./utils");
-
-dotenv.config();
-
-const app = express();
-
-app.use(express.json());
-app.use(cookieParser());
-
-// create in memory database and 2 tables
-const db = new sqlite3.Database(":memory:");
-db.serialize(() => {
-  db.run(
-    "CREATE TABLE IF NOT EXISTS users ( ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, USERNAME TEXT NOT NULL, PASSWORD CHAR(50));"
-  );
-  let stmt = db.prepare(
-    "INSERT INTO users (name, username, password) VALUES (?, ?, ?);"
-  );
-  for (let i = 1; i <= 3; i++) {
-    stmt.run(`Name ${i}`, `username${i}`, `pass${i}`);
-  }
-  stmt.finalize();
-  stmt = null;
-  db.run(
-    "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, post TEXT NOT NULL, username CHAR(50) NOT NULL);"
-  );
-  stmt = db.prepare("INSERT INTO items (post, username) VALUES (?, ?);");
-  for (let i = 1; i <= 50; i++) {
-    stmt.run(`Post ${i} some text`, `username${i}`);
-  }
-  stmt.finalize();
-});
-
+const fs = require('fs');
+require('dotenv').config();
+const db = require('./db');
+const https = require('https');
+const { body, validationResult } = require('express-validator');
 const baseUrl = "/api/v1";
-const refreshTokens = [];
-const port = 4000;
+const app = express();
+const PORT = process.env.PORT || 4000;
+const JWT_SECRET = process.env.JWT_SECRET;
+const TOKEN_EXPIRY = process.env.TOKEN_EXPIRY;
+app.use(express.json());
 
 let origin = "http://localhost";
 console.log("environment:", process.env.NODE_ENV);
@@ -51,94 +22,89 @@ console.log("origin for CORS:", origin);
 
 app.use(
   cors({
-    origin,
-    credentials: true,
+    origin
   })
 );
 
-function authenticateToken(req, res, next) {
-  jwt.verify(
-    req.cookies.accessToken,
-    process.env.ACCESS_TOKEN_SECRET,
-    (err, user) => {
-      if (err) return res.sendStatus(403);
-      req.user = user;
-      next();
-    }
-  );
-}
-
-app.get(baseUrl + "/health", (req, res) => {
-  console.log("Liveness probe ", renderTimeStamp());
-  res.status(200).send("OK");
-});
-
-app.get(baseUrl + "/pod", (req, res) => {
-  const pod = {
-    hostname: os.hostname() || "no info about host name",
-  };
-  res.json(pod);
-});
-
-app.get(baseUrl + "/", (req, res) => {
-  console.log("Readiness probe ", renderTimeStamp());
-  res.status(200).send("OK");
-});
-
-app.post(baseUrl + "/login", validateLogin, (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
-  }
-  const { username, password } = req.body;
-
-  db.all(
-    "SELECT * FROM users WHERE username = ? AND password = ? LIMIT 1",
-    [username, password],
-    (err, rows) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (rows.length) {
-        const user = {
-          id: rows[0].ID,
-          name: rows[0].NAME,
-          username: rows[0].USERNAME,
-        };
-        const accessToken = generateAccessToken(user);
-        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
-          expiresIn: "30min",
+// Middleware to check JWT token
+const authenticateToken = async (req, res, next) => {
+    try {
+        const authHeader = req.header('Authorization');
+        const token = authHeader && authHeader.split(' ')[1];
+        if (!token) return res.sendStatus(401);
+ 
+        const [rows] = await db.execute('SELECT * FROM sw_tokens WHERE token = ? AND is_invalidated = 0', [token]);
+        const tokenData = rows[0];
+        if (!tokenData) return res.sendStatus(403);
+ 
+        jwt.verify(token, JWT_SECRET, (err, user) => {
+            if (err) return res.sendStatus(403);
+            req.user = user;
+            req.token = token;
+            next();
         });
-        refreshTokens.push(refreshToken);
-        res.cookie("accessToken", accessToken, { httpOnly: true });
-        res.cookie("refreshToken", refreshToken, { httpOnly: true });
-        return res.status(200).json({ msg: loginMessage, user });
-      }
-      res.status(403).json({ msg: "Bad username or password" });
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
     }
-  );
+};
+ 
+// Route to register a new user
+app.post(baseUrl+'/register', [
+    body('username').isString().notEmpty().withMessage('Username is required').escape(),
+    body('password').isString().isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+ 
+    try {
+        const { username, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+ 
+        const query = 'INSERT INTO sw_users (username, password) VALUES (?, ?)';
+        await db.execute(query, [username, hashedPassword]);
+ 
+        res.status(201).send('User registered successfully');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
 });
-
-app.post(baseUrl + "/token", (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (refreshToken == null) return res.sendStatus(401);
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    const accessToken = generateAccessToken({ name: user.name });
-    res.cookie("accessToken", accessToken, { httpOnly: true });
-  });
+ 
+// Route to login and get JWT token
+app.post(baseUrl+'/login', [
+    body('username').isString().notEmpty().withMessage('Username is required').escape(),
+    body('password').isString().notEmpty().withMessage('Password is required')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+ 
+    try {
+        const { username, password } = req.body;
+ 
+        const [users] = await db.execute('SELECT * FROM sw_users WHERE username = ?', [username]);
+        const user = users[0];
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(403).send('Invalid username or password');
+        }
+ 
+        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+ 
+        const query = 'INSERT INTO sw_tokens (token, user) VALUES (?, ?)';
+        await db.execute(query, [token, username]);
+        res.json({ token });
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
 });
-
-app.delete(baseUrl + "/logout", (req, res) => {
-  refreshTokens.filter((token) => token !== req.cookies.refreshToken);
-  res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
-  res.cookie("accessToken", "", { httpOnly: true, expires: new Date(0) });
-  res.json({ msg: "HTTP-only tokens has been removed!" });
-});
-
-app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
+ 
+// Protected route
+app.get(baseUrl+'/dashboard', authenticateToken, (req, res) => {
   const pieDataArr = [];
   pieDataArr.push(pd1);
   pieDataArr.push(pd2);
@@ -147,60 +113,60 @@ app.get(baseUrl + "/dashboard", authenticateToken, (req, res) => {
     pieDataArr,
   });
 });
-
-app.get(baseUrl + "/table", async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // Get page number from query, default to 1
-  const pageSize = parseInt(req.query.pageSize) || 10; // Get page size from query, default to 10
-  const offset = (page - 1) * pageSize;
-
-  db.all(
-    "SELECT * FROM items LIMIT ? OFFSET ?",
-    [pageSize, offset],
-    async (err, rows) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (rows.length) {
-        const totalItems = await getTotalRowsCount("items");
-        const totalPages = Math.ceil(totalItems / pageSize);
-        res.json({
-          items: rows,
-          totalItems,
-          totalPages,
-          currentPage: page,
-          pageSize,
-        });
-      }
+ 
+// Route to logout and mark token as expired
+app.post(baseUrl+'/logout', authenticateToken, async (req, res) => {
+    try {
+        const token = req.token;
+        const query = 'UPDATE sw_tokens SET is_invalidated = 1 WHERE token = ?';
+        await db.execute(query, [token]);
+        res.send('Logged out successfully');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
     }
-  );
 });
+ 
+// Route to delete expired tokens
+app.delete(baseUrl+'/deleteTokens', async (req, res) => {
+    try {
+        const currentTime = Math.floor(Date.now() / 1000);
 
-app.get(baseUrl + "/clear", (req, res) => {
-  const refreshTokens = [];
-  res.cookie("refreshToken", "", { httpOnly: true, expires: new Date(0) });
-  res.cookie("accessToken", "", { httpOnly: true, expires: new Date(0) });
-  res.json({
-    message: "refresh token array is empty " + JSON.stringify(refreshTokens),
-  });
+        const [tokens] = await db.query('SELECT * FROM sw_tokens');
+        let deletedCount = 0; // Counter for deleted tokens
+
+        for (const tokenData of tokens) {
+            try {
+                const decodedToken = jwt.verify(tokenData.token, JWT_SECRET);
+                console.log(decodedToken)
+                if (decodedToken.exp <= currentTime) {
+                    await db.query('DELETE FROM sw_tokens WHERE user = ?', [tokenData.user]);
+                    deletedCount++;
+                }
+            } catch (err) {
+                if (err.name === 'TokenExpiredError') {
+                    await db.query('DELETE FROM sw_tokens WHERE user = ?', [tokenData.user]);
+                    deletedCount++;
+                }
+            }
+        }
+
+        const responseMessage = deletedCount === 0 
+            ? 'No tokens deleted' 
+            : `${deletedCount} tokens deleted`;
+
+        res.send(`${responseMessage}`);
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
 });
+ 
+// Read the SSL certificate and key
+const privateKey = fs.readFileSync('/etc/ca-certificates/key.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/ca-certificates/cert.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
 
-function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-}
-
-function getTotalRowsCount(tableName) {
-  return new Promise((resolve, reject) => {
-    db.get(`SELECT COUNT(*) as count FROM ${tableName}`, (err, row) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(row.count);
-      }
-    });
-  });
-}
-
-app.listen(port, () => {
-  console.log(`API service started on port ${port}, API base url is ${baseUrl}`);
-});
+https.createServer(credentials, app).listen(PORT, () => {
+    console.log(`HTTPS Server running on https://localhost:${PORT}`);
+})
