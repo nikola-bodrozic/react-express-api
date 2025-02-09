@@ -23,8 +23,8 @@ describe("Login Test", () => {
 
     cy.get("#dashboard").click();
     cy.url().should("include", "/login");
-    cy.get('input[name="username"]').type("username1");
-    cy.get('input[name="password"]').type("pass1");
+    cy.get('input[name="username"]').type("testuser");
+    cy.get('input[name="password"]').type("password123");
     cy.get('button[type="submit"]').click();
     cy.get("#loader").should("be.visible");
     cy.wait("@postLoginData");

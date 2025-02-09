@@ -13,9 +13,6 @@ const NavBar: React.FC = () => {
                     <Link to="/" id="home">Home</Link>
                 </li>
                 <li>
-                    <Link to="/datagrid" id="datagrid">DataGrid</Link>
-                </li>
-                <li>
                     <Link to="/about" id="about">About</Link>
                 </li>
                 <li>

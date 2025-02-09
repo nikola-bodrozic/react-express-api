@@ -1,6 +1,6 @@
 import './Dashboard.css'
 import { useEffect, useState } from "react";
-import axiosRetry from 'axios-retry';
+// import axiosRetry from 'axios-retry';
 import axios from "../../axiosConfig";
 import { Pie } from "react-chartjs-2";
 import {
@@ -22,32 +22,23 @@ interface IPieData {
   datasets: IDatasets[]
 }
 
-axiosRetry(axios, {
-  retries: 5,
-  retryDelay: (retryCount) => {
-    console.log(`Retry attempt: ${retryCount}`);
-    return 1000;
-  },
-  retryCondition: (error) => {
-    return axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error);
-  },
-});
-
 const Dashboard = () => {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [pieDataArr, setPieDataArr] = useState<IPieData[] | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
     const getData = async () => {
+      const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
       try {
-        const res = await axios.get("/dashboard", { signal });
+        const res = await axios.get("/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+          }
+        });
         setMsg(res.data.message);
         setPieDataArr(res.data.pieDataArr);
-      } catch (error: unknown) {
+      } catch (error) {
         if (axios.isCancel(error)) {
           console.error('Request canceled:', error.message);
         } else {
@@ -60,11 +51,8 @@ const Dashboard = () => {
     };
 
     getData();
-
-    return () => {
-      controller.abort();
-    };
   }, []);
+
 
 
   return isLoading ? (

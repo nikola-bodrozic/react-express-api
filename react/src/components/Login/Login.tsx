@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import "./Login.css";
 import { useAuth } from "../../AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -6,64 +6,49 @@ import axios from "../../axiosConfig";
 import { toast } from "react-toastify";
 import Loader from "react-js-loader";
 
-interface errorMsg {
-  type?: string;
-  value?: string;
-  msg?: string;
-}
-
 const Login = () => {
-  const { login, logout, renderName } = useAuth();
+  const { login, renderName } = useAuth();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("testuser");
+  const [password, setPassword] = useState("password123");
   const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-    const signal = controller.signal;
     setIsLoading(true);
     try {
       const res = await axios.post(
         "/login",
         {
           username,
-          password,
-        },
-        {
-          signal
+          password
         }
       );
-      renderName(res.data.user.name);
+      // console.log(res.data)
+      renderName(res.data.username);
+      localStorage.setItem('jwtToken', res.data.token);
+      // console.log(res.data.token, res.data.username)
+      // return
       login();
       toast.success("Logged in successfully!");
       setIsLoading(false);
       navigate("/dashboard");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error: unknown) {
       setIsLoading(false);
-      const tmpErr: string[] = [];
-      error.response.data.errors.map((el: errorMsg) =>
-        tmpErr.push(el.msg as string)
-      );
-      setErrorMessage(tmpErr);
-      logout();
+      console.log(error);
+
+      if (axios.isAxiosError(error)) {
+        // Handle Axios error
+        setErrorMessage([error.message]);
+      } else {
+        // Handle unexpected error
+        setErrorMessage(['An unexpected error occurred']);
+      }
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        console.log('Request aborted on component unmount');
-      }
-    };
-  }, []);
 
   return isLoading ? (
     <div>
