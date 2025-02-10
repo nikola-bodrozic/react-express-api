@@ -1,11 +1,4 @@
 {
-  "welcome": "welcome to dashboard",
-  "hostInfo": {
-      "statusCode": 200,
-      "body": {
-          "hostname": "testHost"
-      }
-  },
   "dashBoardInfo":{
     "statusCode": 200,
     "body": {
@@ -41,7 +34,7 @@
     "statusCode": 200,
     "body": {
       "msg": "Login successful",
-      "user": { "id": 1, "name": "Name 1", "username": "username1" }
+      "user": { "id": 1, "name": "Name 1", "username": "testuser" }
     }
   },
   "shortCreds":{

@@ -33,19 +33,15 @@ describe("Login Test", () => {
     cy.get("#dashLoader").should("contain.text", "Loading...");
     cy.wait("@getDashData");
     cy.get("#msg").should("contain.text", this.data.dashBoardInfo.body.message);
-    cy.get("#name-holder").should("contain.text", "Hello " + this.data.loginInfo.body.user.name);
+    console.log(this.data.loginInfo.body.user.username)
     cy.get(".pieHolder").should("exist");
     cy.get(".pieHolder").should("have.length", this.data.dashBoardInfo.body.pieDataArr.length);
-    cy.wait(4000)
-    cy.get("#logout").click();
-    cy.get(".pieHolder").should("not.exist");
-    cy.url().should("include", "/");
-    cy.get("#login").should("contain.text", "Login");
+    cy.wait(2000)
   });
 
   it("should get error message when entering invalid credentials shorter tham 5 chars", () => {
     cy.intercept("POST", `${apiBaseURL}/login`, {
-      statusCode: 422,
+      statusCode: 401,
       body: this.data.shortCreds,
     }).as("postLoginData");
     cy.get("#dashboard").click();

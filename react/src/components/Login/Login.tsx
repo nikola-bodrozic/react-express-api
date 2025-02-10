@@ -10,8 +10,8 @@ const Login = () => {
   const { login, renderName } = useAuth();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("testuser");
-  const [password, setPassword] = useState("password123");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,22 +29,15 @@ const Login = () => {
       // console.log(res.data)
       renderName(res.data.username);
       localStorage.setItem('jwtToken', res.data.token);
-      // console.log(res.data.token, res.data.username)
-      // return
       login();
       toast.success("Logged in successfully!");
       setIsLoading(false);
       navigate("/dashboard");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown) {
       setIsLoading(false);
-      console.log(error);
-
       if (axios.isAxiosError(error)) {
-        // Handle Axios error
-        setErrorMessage([error.message]);
+        error.response && setErrorMessage(error.response.data.errors);
       } else {
-        // Handle unexpected error
         setErrorMessage(['An unexpected error occurred']);
       }
     }
@@ -65,9 +58,9 @@ const Login = () => {
     <>
       <div id="error">
         {errorMessage.length > 0 &&
-          errorMessage.map((el: string, index: number) => (
+          errorMessage.map((el: any, index: number) => (
             <div key={index} className="err-item">
-              {el}
+              {el.msg}
             </div>
           ))}
       </div>

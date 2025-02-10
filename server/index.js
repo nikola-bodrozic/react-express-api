@@ -6,6 +6,7 @@ const { loginMessage, pd1, pd2 } = require("./constants");
 const fs = require('fs');
 require('dotenv').config();
 const db = require('./db');
+const { validateLogin, renderTimeStamp } = require("./utils");
 const https = require('https');
 const { body, validationResult } = require('express-validator');
 const baseUrl = "/api/v1";
@@ -52,8 +53,8 @@ const authenticateToken = async (req, res, next) => {
 
 // Route to register a new user
 app.post(baseUrl + '/register', [
-    body('username').isString().notEmpty().withMessage('Username is required').escape(),
-    body('password').isString().isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+    body('username').isString().isLength({ min: 5 }).withMessage('Username must be at least 5 characters long').escape(),
+    body('password').isString().isLength({ min: 5 }).withMessage('Password must be at least 5 characters long')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -75,26 +76,18 @@ app.post(baseUrl + '/register', [
 });
 
 // Route to login and get JWT token
-app.post(baseUrl + '/login', [
-    body('username').isString().notEmpty().withMessage('Username is required').escape(),
-    body('password').isString().notEmpty().withMessage('Password is required')
-], async (req, res) => {
+app.post(baseUrl + '/login', validateLogin, async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
+    if (!errors.isEmpty()) 
+        return res.status(401).json({ errors: errors.array() });
     try {
         const { username, password } = req.body;
-
         const [users] = await db.execute('SELECT * FROM sw_users WHERE username = ?', [username]);
         const user = users[0];
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(403).send('Invalid username or password');
         }
-
         const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
-
         const query = 'INSERT INTO sw_tokens (token, user) VALUES (?, ?)';
         await db.execute(query, [token, username]);
         res.json({ token, username });
@@ -118,7 +111,9 @@ app.get(baseUrl + '/dashboard', authenticateToken, (req, res) => {
 // Route to logout and mark token as expired
 app.post(baseUrl + '/logout', authenticateToken, async (req, res) => {
     try {
+        // console.log(req)
         const token = req.token;
+        console.log("-----"+token)
         const query = 'UPDATE sw_tokens SET is_invalidated = 1 WHERE token = ?';
         await db.execute(query, [token]);
         res.send('Logged out successfully');
@@ -163,11 +158,6 @@ app.delete(baseUrl + '/deleteTokens', async (req, res) => {
     }
 });
 
-// Read the SSL certificate and key
-const privateKey = fs.readFileSync('/etc/ca-certificates/key.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/ca-certificates/cert.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
-
-https.createServer(credentials, app).listen(PORT, () => {
-    console.log(`HTTPS Server running on https://localhost:${PORT}`);
-})
+app.listen(PORT, () => {
+  console.log(`API service started on port ${PORT}, API base url is ${baseUrl}`);
+});
