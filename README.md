@@ -41,17 +41,24 @@ Install dependencies in `server/` folder with `yarn` and use `yarn dev` to start
 
 start only react app, response from API is mocked. Determine on which port React app is running and if needed update `reactBaseURL` in `/react/cypress/e2e/login-fixtures.cy.ts` in line 5.
 
-In react folder for headless browser run
+In react folder set your env. variable for password. For headless browser run
 ```sh
-yarn e2e
+yarn e2e --env password=pass..##A
 ``` 
 
 for Cypress GUI
 ```sh
-yarn e2e:gui
+yarn e2e:gui --env password=pass..##A
 ``` 
 
 select E2E testing, choose browser and click on `login-fixtures.cy.ts`
+
+in spec file `react/cypress/e2e/login-fixtures.cy.ts` there is
+
+```sh
+cy.get('input[name="password"]').type(Cypress.env('password'), {log: false})
+```
+it prevents logging password
 
 ### usefull cURL calls against API
 
