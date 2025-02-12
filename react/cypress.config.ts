@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { defineConfig } from "cypress";
 
 export default defineConfig({
@@ -6,7 +7,10 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
-    video: true,
-    screenshotOnRunFailure: true
+    video: false,
+    screenshotOnRunFailure: true,
+    env: {
+      password: process.env.CYPRESS_PASSWORD
+    }
   },
 });

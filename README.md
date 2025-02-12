@@ -4,7 +4,7 @@ Express API server, React TypeScript & MySQL
  
 Features:
 - HTTPS connection using self-signed certificates
-- JWT access token
+- stateles app using JWT access token
 - Protected route on Express and React
 - Cypress E2E tests
 
@@ -41,14 +41,16 @@ Install dependencies in `server/` folder with `yarn` and use `yarn dev` to start
 
 start only react app, response from API is mocked. Determine on which port React app is running and if needed update `reactBaseURL` in `/react/cypress/e2e/login-fixtures.cy.ts` in line 5.
 
-In react folder set your env. variable for password. For headless browser run
+For headless browser run
 ```sh
-yarn e2e --env password=pass..##A
+export CYPRESS_PASSWORD=pass###..w0d
+yarn e2e
 ``` 
 
 for Cypress GUI
 ```sh
-yarn e2e:gui --env password=pass..##A
+export CYPRESS_PASSWORD=pass###..w0d
+yarn e2e:gui
 ``` 
 
 select E2E testing, choose browser and click on `login-fixtures.cy.ts`
@@ -58,7 +60,7 @@ in spec file `react/cypress/e2e/login-fixtures.cy.ts` there is
 ```sh
 cy.get('input[name="password"]').type(Cypress.env('password'), {log: false})
 ```
-it prevents logging password
+it prevents logging password and shows how to use env. variables in Cypress.
 
 ### usefull cURL calls against API
 
@@ -170,3 +172,11 @@ http {
 ```
 on Linux make sure that sudo is used for example `sudo systemctl reload nginx`. In react folder run `yarn preview` to start prod. build on `http://localhost:4173/`
 Now you can open `https://localhost` nginx will serve react app on HTTPS.
+
+Backend is only accessible to frontend
+```
+location /api/v1/ {
+    allow 127.0.0.1;
+    deny all;
+...
+```
