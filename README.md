@@ -1,10 +1,13 @@
 # Full Stack
 
-Express API server & React TypeScript
+Express API server, React TypeScript & MySQL
  
-Features: 
-- JWT access token in local storage 
-- Cypress testing
+Features:
+- HTTPS connection using self-signed certificates
+- JWT access token
+- Protected route on Express and React
+- Cypress E2E tests
+
 
 ## Prepare
 
@@ -27,6 +30,7 @@ CREATE TABLE sw_tokens (
     is_invalidated BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
 
 ### Deployment in Local Environment
 
@@ -35,9 +39,9 @@ Install dependencies in `server/` folder with `yarn` and use `yarn dev` to start
 
 ### Running Cypress tests
 
-start only react app, response from API is mocked. In react folder
+start only react app, response from API is mocked. Determine on which port React app is running and if needed update `reactBaseURL` in `/react/cypress/e2e/login-fixtures.cy.ts` in line 5.
 
-for headless browser
+In react folder for headless browser run
 ```sh
 yarn e2e
 ``` 
@@ -52,7 +56,7 @@ select E2E testing, choose browser and click on `login-fixtures.cy.ts`
 ### usefull cURL calls against API
 
 ```sh
-# put first user in database
+# put user in database
 curl -X POST http://localhost:4000/api/v1/register \
     -H "Content-Type: application/json" \
     -d '{
@@ -89,3 +93,73 @@ curl -X GET http://localhost:4000/api/v1/dashboard -H "Content-Type: application
 # clean up tokens older than 1 hour but not invalidated tokens
 curl -X DELETE http://localhost:4000/api/v1/deleteTokens -H "Content-Type: application/json"
 ```
+
+### Deplyment using NGINX reverse proxy:
+
+Put certificates in:
+```sh
+ssl_certificate /etc/ca-certificates/cert.pem;
+ssl_certificate_key /etc/ca-certificates/key.pem;
+```
+and nginx.conf is
+
+```
+events {
+    worker_connections 1024;
+}
+
+http {
+    server {
+        listen 80;
+        server_name localhost;
+
+        # Redirect HTTP to HTTPS
+        location / {
+            return 301 https://$host$request_uri;
+        }
+        # Add access and error logs for the HTTP server
+        access_log /var/log/nginx/access_http.log;
+        error_log /var/log/nginx/error_http.log;
+    }
+
+    server {
+        listen 443 ssl;
+        server_name localhost;
+
+        ssl_certificate /etc/ca-certificates/cert.pem;
+        ssl_certificate_key /etc/ca-certificates/key.pem;
+
+        # Add access and error logs for the HTTPS server
+        access_log /var/log/nginx/access_https.log;
+        error_log /var/log/nginx/error_https.log;
+
+        location / {
+            proxy_pass http://localhost:4173;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization' always;
+        }
+
+        location /api/v1/ {
+            allow 127.0.0.1;
+            deny all;
+            proxy_pass http://localhost:4000/api/v1/;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization' always;
+        }
+    }
+}
+```
+on Linux make sure that sudo is used for example `sudo systemctl reload nginx`. In react folder run `yarn preview` to start prod. build on `http://localhost:4173/`
+Now you can open `https://localhost` nginx will serve react app on HTTPS.
