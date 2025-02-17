@@ -93,14 +93,26 @@ app.post(baseUrl + '/login', validateLogin, async (req, res) => {
 });
 
 // Protected route
-app.get(baseUrl + '/dashboard', authenticateToken, (req, res) => {
+app.get(baseUrl + '/dashboard', authenticateToken, async (req, res) => {
     const pieDataArr = [];
     pieDataArr.push(pd1);
     pieDataArr.push(pd2);
-    res.json({
-        message: "welcome to dashboard",
-        pieDataArr,
-    });
+    let posts = [];
+    try {
+        const username = req.user.username;
+        [posts] = await db.execute('SELECT * FROM sw_posts WHERE username = ?', [username]);
+        console.log(posts)
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    } finally {
+        res.json({
+            message: "welcome to dashboard",
+            pieDataArr,
+            posts
+        });
+    }
+
 });
 
 // Route to logout and mark token as expired

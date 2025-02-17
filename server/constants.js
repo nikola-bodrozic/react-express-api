@@ -1,5 +1,3 @@
-const loginMessage = "Login successful";
-
 const pd1 = {
     labels: ["Customer", "Business"],
     datasets: [
