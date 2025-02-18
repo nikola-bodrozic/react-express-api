@@ -9,7 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Use named import for jwt-decode
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -33,12 +33,13 @@ const Dashboard = () => {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
+  const [deletingPosts, setDeletingPosts] = useState<number[]>([]); // Track posts being deleted
   const [pieDataArr, setPieDataArr] = useState<IPieData[] | null>(null);
   const token = localStorage.getItem('jwtToken');
 
   const decodeToken = (token: string) => {
     try {
-      const decoded = jwtDecode<ITokenPayload>(token);
+      const decoded = jwtDecode<ITokenPayload>(token); // Use named import for decoding
       return decoded.username;
     } catch (error) {
       console.error('Failed to decode token:', error);
@@ -91,20 +92,24 @@ const Dashboard = () => {
 
   const handleDelete = async (postId: number) => {
     try {
+      setDeletingPosts(prev => [...prev, postId]);
+      await new Promise(resolve => setTimeout(resolve, 800));
       await axios.delete(`/posts/${postId}`, { 
         headers: {
           Authorization: `Bearer ${token}`, 
+          'Content-Type': 'application/json'
         },
         withCredentials: true
       });
-      setPosts(prevPosts => prevPosts.filter((post:any) => post.id !== postId));
+      setPosts(prevPosts => prevPosts.filter((post: any) => post.id !== postId));
+      setDeletingPosts(prev => prev.filter(id => id !== postId));
     } catch (error) {
-      console.error('Delete faixcled:', error);
+      console.error('Delete failed:', error);
     }
   }
 
   return isLoading ? (
-    <p id="dashLoader">Loading..</p>
+    <p id="dashLoader">Loading...</p>
   ) : (
     <>
       <p id="msg">{msg}</p>
@@ -113,7 +118,7 @@ const Dashboard = () => {
       </div>
       <div>
         {posts.map((post: any) => (
-          <div key={post.id} className="post">
+          <div key={post.id} className={`post ${deletingPosts.includes(post.id) ? 'disappearing' : ''}`}>
             <div className="content">
               <h2>{post.title}</h2>
               <p>{post.content}</p>

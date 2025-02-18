@@ -4,16 +4,16 @@ Express API server, React TypeScript & MySQL
  
 Features:
 - HTTPS connection using self-signed certificates
-- stateles app using JWT access token
-- Protected route on Express and React
+- stateless app using JWT access token
+- Protected routes on Express and React
 - Cypress E2E tests
 
 
 ## Prepare
 
-in `server/` folder rename `.env.sample` to `.env` file  and set values for env. variables
+in `server/` folder rename `.env.sample` to `.env` file  and set values for env. variables.
 
-create table in database
+Create table in database
 
 ```SQL
 CREATE TABLE sw_users (
@@ -30,12 +30,39 @@ CREATE TABLE sw_tokens (
     is_invalidated BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE `sw_posts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `username` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `username` (`username`),
+  CONSTRAINT `sw_posts_ibfk_1` FOREIGN KEY (`username`) REFERENCES `sw_users` (`username`)
+);
+
+-- populate sw_posts with dummy data
+
+INSERT INTO sw_posts (id, title, content, created_at, username) VALUES (3, 'New Title 3', 'Content 3', '2025-02-17 00:03:00', 'testuser3');
+INSERT INTO sw_posts (id, title, content, created_at, username) VALUES (4, 'New Title 4', 'Content 4', '2025-02-17 00:04:00', 'testuser4');
+INSERT INTO sw_posts (id, title, content, created_at, username) VALUES (5, 'New Title 5', 'Content 5', '2025-02-17 00:05:00', 'testuser5');
 ```
 
 ### Deployment in Local Environment
 
 In `react/` folders install dependancies with `yarn` and start the React app with `yarn dev`.
-Install dependencies in `server/` folder with `yarn` and use `yarn dev` to start the API server. 
+Install dependencies in `server/` folder with `yarn` and use `yarn dev` to start the API server.
+
+To put first user run 
+```sh
+curl -X POST http://localhost:4000/api/v1/register \
+    -H "Content-Type: application/json" \
+    -d '{
+        "username": "testuser",
+        "password": "password123"
+    }'
+```
 
 ### Running Cypress tests
 
