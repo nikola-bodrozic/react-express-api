@@ -10,8 +10,8 @@ const Login = () => {
   const { login, renderName } = useAuth();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("testuser");
-  const [password, setPassword] = useState("password123");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 

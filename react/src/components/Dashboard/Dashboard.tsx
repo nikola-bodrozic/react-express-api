@@ -40,11 +40,11 @@ const Dashboard = () => {
     const controller = new AbortController();
     const signal = controller.signal;
     const getData = async () => {
-      const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+      const token = localStorage.getItem('jwtToken'); 
       try {
         const res = await axios.get("/dashboard", {
           headers: {
-            Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+            Authorization: `Bearer ${token}`, 
           },
           signal: signal
         });
@@ -64,7 +64,7 @@ const Dashboard = () => {
     };
 
     getData();
-    // Cleanup function to abort the request if the component unmounts
+
     return () => controller.abort();
 
   }, []);
@@ -81,13 +81,12 @@ const Dashboard = () => {
       </div>
       <div>
         {posts.map((post: any) => (
-          <div key={post.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 20px' }}>
+          <div key={post.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px' }}>
             <h2>{post.title}</h2>
             <p>{post.content}</p>
           </div>
         ))}
       </div>
-
     </>
   );
 };

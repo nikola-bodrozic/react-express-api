@@ -20,4 +20,4 @@ const pd2 = {
     ],
 };
 
-module.exports = { loginMessage, pd1, pd2 }
+module.exports = { pd1, pd2 }
