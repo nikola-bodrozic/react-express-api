@@ -9,6 +9,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import {jwtDecode} from 'jwt-decode';
+
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface IDatasets {
@@ -22,11 +24,30 @@ interface IPieData {
   datasets: IDatasets[]
 }
 
+interface ITokenPayload {
+  username: string;
+  // Add any other fields your token payload might contain
+}
+
 const Dashboard = () => {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useState([]);
   const [pieDataArr, setPieDataArr] = useState<IPieData[] | null>(null);
+  const token = localStorage.getItem('jwtToken');
+
+  const decodeToken = (token: string) => {
+    try {
+      const decoded = jwtDecode<ITokenPayload>(token);
+      return decoded.username;
+    } catch (error) {
+      console.error('Failed to decode token:', error);
+      return null;
+    }
+  }
+
+  const username = decodeToken(token as string);
+
   axiosRetry(axios, {
     retries: 3,
     retryDelay: (retryCount: number) => {
@@ -36,11 +57,11 @@ const Dashboard = () => {
       return error.response && (error.response.status === 500 || error.response.status === 503);
     }
   });
+
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
     const getData = async () => {
-      const token = localStorage.getItem('jwtToken'); 
       try {
         const res = await axios.get("/dashboard", {
           headers: {
@@ -49,7 +70,7 @@ const Dashboard = () => {
           signal: signal
         });
         setMsg(res.data.message);
-        setPosts(res.data.posts)
+        setPosts(res.data.posts);
         setPieDataArr(res.data.pieDataArr);
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -66,13 +87,24 @@ const Dashboard = () => {
     getData();
 
     return () => controller.abort();
+  }, [token]);
 
-  }, []);
-
-
+  const handleDelete = async (postId: number) => {
+    try {
+      await axios.delete(`/posts/${postId}`, { 
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+        withCredentials: true
+      });
+      setPosts(prevPosts => prevPosts.filter((post:any) => post.id !== postId));
+    } catch (error) {
+      console.error('Delete faixcled:', error);
+    }
+  }
 
   return isLoading ? (
-    <p id="dashLoader">Loading...</p>
+    <p id="dashLoader">Loading..</p>
   ) : (
     <>
       <p id="msg">{msg}</p>
@@ -81,9 +113,14 @@ const Dashboard = () => {
       </div>
       <div>
         {posts.map((post: any) => (
-          <div key={post.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px' }}>
-            <h2>{post.title}</h2>
-            <p>{post.content}</p>
+          <div key={post.id} className="post">
+            <div className="content">
+              <h2>{post.title}</h2>
+              <p>{post.content}</p>
+            </div>
+            {post.username === username && (
+              <button className="deleteButton" onClick={() => handleDelete(post.id)}>Delete</button>
+            )}
           </div>
         ))}
       </div>

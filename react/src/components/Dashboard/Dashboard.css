@@ -1,12 +1,62 @@
-.pieHolder {
-    width: 45%;
+#msg {
+    font-size: 1.5em;
+    font-weight: bold;
     margin: 10px;
-    border: 1px solid black
+    text-align: center;
 }
 
 .pies {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
-  }
-  
+    justify-content: center;
+    gap: 20px;
+    margin: 20px;
+}
+
+.pieHolder {
+    width: 40%;
+    min-width: 300px;
+}
+
+#dashLoader {
+    font-size: 1.2em;
+    color: #777;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.post {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 20px;
+}
+
+.content {
+    flex: 4;
+    margin-right: 10px;
+}
+
+.deleteButton {
+    flex: 1;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.deleteButton:hover {
+    background-color: #218838;
+}
+
+.content h2 {
+    margin-bottom: 5px;
+}
+
+.content p {
+    margin: 0;
+}

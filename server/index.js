@@ -17,9 +17,10 @@ app.use(express.json());
 console.log("environment:", process.env.NODE_ENV);
 
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+    origin: 'http://localhost:5174',
+    methods: ['GET', 'POST', 'OPTIONS', 'DELETE'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+    credentials: true
 }));
 
 
@@ -99,8 +100,8 @@ app.get(baseUrl + '/dashboard', authenticateToken, async (req, res) => {
     pieDataArr.push(pd2);
     let posts = [];
     try {
-        const username = req.user.username;
-        [posts] = await db.execute('SELECT * FROM sw_posts WHERE username = ?', [username]);
+        // const username = req.user.username;
+        [posts] = await db.execute('SELECT * FROM sw_posts');
         console.log(posts)
     } catch (err) {
         console.error(err);
@@ -112,10 +113,26 @@ app.get(baseUrl + '/dashboard', authenticateToken, async (req, res) => {
             posts
         });
     }
-
 });
 
-// Route to logout and mark token as expired
+app.delete(baseUrl + '/posts/:id', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const username = req.user.username;
+    console.log(id, username)
+    try {
+        const result = await db.execute('DELETE FROM sw_posts WHERE id = ? AND username = ?', [id, username]);
+        console.log(result[0].affectedRows)
+        if (result[0].affectedRows > 0) {
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(403);
+        }
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
 app.post(baseUrl + '/logout', authenticateToken, async (req, res) => {
     try {
         const token = req.token;
@@ -128,14 +145,11 @@ app.post(baseUrl + '/logout', authenticateToken, async (req, res) => {
     }
 });
 
-// Route to delete expired tokens
 app.delete(baseUrl + '/deleteTokens', async (req, res) => {
     try {
         const currentTime = Math.floor(Date.now() / 1000);
-
         const [tokens] = await db.query('SELECT * FROM sw_tokens');
-        let deletedCount = 0; // Counter for deleted tokens
-
+        let deletedCount = 0;
         for (const tokenData of tokens) {
             try {
                 const decodedToken = jwt.verify(tokenData.token, JWT_SECRET);
