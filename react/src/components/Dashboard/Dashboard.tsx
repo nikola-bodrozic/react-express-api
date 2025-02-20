@@ -19,6 +19,14 @@ interface IDatasets {
   borderWidth: number;
 }
 
+interface IPost {
+  id: number;
+  title: string;
+  content: string;
+  created_at?: string;
+  username: string;
+}
+
 interface IPieData {
   labelers: string[]
   datasets: IDatasets[]
@@ -101,7 +109,7 @@ const Dashboard = () => {
         },
         withCredentials: true
       });
-      setPosts(prevPosts => prevPosts.filter((post: any) => post.id !== postId));
+      setPosts(prevPosts => prevPosts.filter((post: IPost) => post.id !== postId));
       setDeletingPosts(prev => prev.filter(id => id !== postId));
     } catch (error) {
       console.error('Delete failed:', error);
@@ -117,7 +125,7 @@ const Dashboard = () => {
         {pieDataArr?.map((pieData: IPieData, index: number) => <div key={`holder${index}`} className="pieHolder"><Pie id={`pie${index}`} data={pieData} width={"80%"} options={{ maintainAspectRatio: false }} /></div>)}
       </div>
       <div>
-        {posts.map((post: any) => (
+        {posts.map((post: IPost) => (
           <div key={post.id} className={`post ${deletingPosts.includes(post.id) ? 'disappearing' : ''}`}>
             <div className="content">
               <h2>{post.title}</h2>

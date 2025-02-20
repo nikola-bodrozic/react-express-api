@@ -26,7 +26,6 @@ const Login = () => {
           password
         }
       );
-      // console.log(res.data)
       renderName(res.data.username);
       localStorage.setItem('jwtToken', res.data.token);
       login();
