@@ -7,11 +7,12 @@ Features:
 - stateless app using JWT access token
 - Protected routes on Express and React
 - Cypress E2E tests
+- Form validation using computed prop name in `FormValidator.tsx`
 
 
 ## Prepare
 
-in `server/` folder rename `.env.sample` to `.env` file  and set values for env. variables.
+In `server/` folder rename `.env.sample` to `.env` file  and set values for env. variables.
 
 Create table in database
 
