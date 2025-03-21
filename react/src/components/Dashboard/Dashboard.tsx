@@ -9,7 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { jwtDecode } from 'jwt-decode'; // Use named import for jwt-decode
+import { jwtDecode } from 'jwt-decode';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -34,20 +34,19 @@ interface IPieData {
 
 interface ITokenPayload {
   username: string;
-  // Add any other fields your token payload might contain
 }
 
 const Dashboard = () => {
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
-  const [deletingPosts, setDeletingPosts] = useState<number[]>([]); // Track posts being deleted
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const [deletingPosts, setDeletingPosts] = useState<number[]>([]);
   const [pieDataArr, setPieDataArr] = useState<IPieData[] | null>(null);
   const token = localStorage.getItem('jwtToken');
 
   const decodeToken = (token: string) => {
     try {
-      const decoded = jwtDecode<ITokenPayload>(token); // Use named import for decoding
+      const decoded = jwtDecode<ITokenPayload>(token);
       return decoded.username;
     } catch (error) {
       console.error('Failed to decode token:', error);
@@ -78,6 +77,7 @@ const Dashboard = () => {
           },
           signal: signal
         });
+        console.log(res.data)
         setMsg(res.data.message);
         setPosts(res.data.posts);
         setPieDataArr(res.data.pieDataArr);

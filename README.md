@@ -14,17 +14,17 @@ Features:
 
 In `server/` folder rename `.env.sample` to `.env` file  and set values for env. variables.
 
-Create table in database
+Create tables in database
 
 ```SQL
-CREATE TABLE sw_users (
+CREATE TABLE IF NOT EXISTS sw_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE sw_tokens (
+CREATE TABLE IF NOT EXISTS sw_tokens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     token TEXT NOT NULL,
     user VARCHAR(255) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE sw_tokens (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `sw_posts` (
+CREATE TABLE IF NOT EXISTS `sw_posts` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `content` text NOT NULL,
@@ -43,11 +43,40 @@ CREATE TABLE `sw_posts` (
   CONSTRAINT `sw_posts_ibfk_1` FOREIGN KEY (`username`) REFERENCES `sw_users` (`username`)
 );
 
+-- populate sw_users with test users, set password using bcrypt         
+-- const hashedPassword = await bcrypt.hash(password, 10);
+
+INSERT INTO `sw_users` (`id`, `username`, `hashedPassword`, `created_at`) VALUES (1, 'testuser', '', '2025-03-26 00:12:00');
+INSERT INTO `sw_users` (`id`, `username`, `hashedPassword`, `created_at`) VALUES (2, 'testmike', '', '2025-03-26 00:16:11');
+
 -- populate sw_posts with dummy data
 
-INSERT INTO sw_posts (id, title, content, created_at, username) VALUES (3, 'New Title 3', 'Content 3', '2025-02-17 00:03:00', 'testuser3');
-INSERT INTO sw_posts (id, title, content, created_at, username) VALUES (4, 'New Title 4', 'Content 4', '2025-02-17 00:04:00', 'testuser4');
-INSERT INTO sw_posts (id, title, content, created_at, username) VALUES (5, 'New Title 5', 'Content 5', '2025-02-17 00:05:00', 'testuser5');
+INSERT INTO sw_posts (id, title, content, created_at, username) 
+VALUES (
+  1, 
+  'Lorem ipsum dolor sit amet', 
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt', 
+  '2025-02-17 00:03:00', 
+  'testuser'
+);
+
+INSERT INTO sw_posts (id, title, content, created_at, username) 
+VALUES (
+  2, 
+  'Vestibulum ante ipsum primis', 
+  'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.', 
+  '2025-02-17 00:04:00', 
+  'testuser'
+);
+
+INSERT INTO sw_posts (id, title, content, created_at, username) 
+VALUES (
+  3, 
+  'Pellentesque in ipsum id orci', 
+  'Pellentesque in ipsum id orci porta dapibus. Curabitur non nulla sit amet nisl tempus convallis quis ac lectus', 
+  '2025-02-17 00:05:00', 
+  'testmike'
+);
 ```
 
 ### Deployment in Local Environment
@@ -55,29 +84,19 @@ INSERT INTO sw_posts (id, title, content, created_at, username) VALUES (5, 'New 
 In `react/` folders install dependancies with `yarn` and start the React app with `yarn dev`.
 Install dependencies in `server/` folder with `yarn` and use `yarn dev` to start the API server.
 
-To put first user run 
-```sh
-curl -X POST http://localhost:4000/api/v1/register \
-    -H "Content-Type: application/json" \
-    -d '{
-        "username": "testuser",
-        "password": "password123"
-    }'
-```
-
 ### Running Cypress tests
 
 start only react app, response from API is mocked. Determine on which port React app is running and if needed update `reactBaseURL` in `/react/cypress/e2e/login-fixtures.cy.ts` in line 5.
 
 For headless browser run
 ```sh
-export CYPRESS_PASSWORD=pass###..w0d
+export CYPRESS_PASSWORD=random-string
 yarn e2e
 ``` 
 
 for Cypress GUI
 ```sh
-export CYPRESS_PASSWORD=pass###..w0d
+export CYPRESS_PASSWORD=random-string
 yarn e2e:gui
 ``` 
 
@@ -93,14 +112,6 @@ it prevents logging password and shows how to use env. variables in Cypress.
 ### usefull cURL calls against API
 
 ```sh
-# put user in database
-curl -X POST http://localhost:4000/api/v1/register \
-    -H "Content-Type: application/json" \
-    -d '{
-        "username": "testuser",
-        "password": "password123"
-    }'
-
 # obtain JTW token
 curl -X POST http://localhost:4000/api/v1/login \
     -H "Content-Type: application/json" \

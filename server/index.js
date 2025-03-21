@@ -10,14 +10,14 @@ const { body, validationResult } = require('express-validator');
 const baseUrl = "/api/v1";
 const app = express();
 const PORT = process.env.PORT || 4000;
-const JWT_SECRET = process.env.JWT_SECRET;
+const TOKEN_SECRET = process.env.TOKEN_SECRET;
 const TOKEN_EXPIRY = process.env.TOKEN_EXPIRY;
 app.use(express.json());
 
 console.log("environment:", process.env.NODE_ENV);
 
 app.use(cors({
-    origin: 'http://localhost:5174',
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'OPTIONS', 'DELETE'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     credentials: true
@@ -35,7 +35,7 @@ const authenticateToken = async (req, res, next) => {
         const tokenData = rows[0];
         if (!tokenData) return res.sendStatus(403);
 
-        jwt.verify(token, JWT_SECRET, (err, user) => {
+        jwt.verify(token, TOKEN_SECRET, (err, user) => {
             if (err) return res.sendStatus(403);
             req.user = user;
             req.token = token;
@@ -46,30 +46,6 @@ const authenticateToken = async (req, res, next) => {
         res.sendStatus(500);
     }
 };
-
-// Route to register a new user
-app.post(baseUrl + '/register', [
-    body('username').isString().isLength({ min: 5 }).withMessage('Username must be at least 5 characters long').escape(),
-    body('password').isString().isLength({ min: 5 }).withMessage('Password must be at least 5 characters long')
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-        const { username, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const query = 'INSERT INTO sw_users (username, password) VALUES (?, ?)';
-        await db.execute(query, [username, hashedPassword]);
-
-        res.status(201).send('User registered successfully');
-    } catch (err) {
-        console.error(err);
-        res.sendStatus(500);
-    }
-});
 
 // Route to login and get JWT token
 app.post(baseUrl + '/login', validateLogin, async (req, res) => {
@@ -83,7 +59,7 @@ app.post(baseUrl + '/login', validateLogin, async (req, res) => {
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(403).send('Invalid username or password');
         }
-        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+        const token = jwt.sign({ username }, TOKEN_SECRET, { expiresIn: TOKEN_EXPIRY });
         const query = 'INSERT INTO sw_tokens (token, user) VALUES (?, ?)';
         await db.execute(query, [token, username]);
         res.json({ token, username });
@@ -100,9 +76,7 @@ app.get(baseUrl + '/dashboard', authenticateToken, async (req, res) => {
     pieDataArr.push(pd2);
     let posts = [];
     try {
-        // const username = req.user.username;
         [posts] = await db.execute('SELECT * FROM sw_posts');
-        console.log(posts)
     } catch (err) {
         console.error(err);
         res.sendStatus(500);
@@ -118,10 +92,8 @@ app.get(baseUrl + '/dashboard', authenticateToken, async (req, res) => {
 app.delete(baseUrl + '/posts/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const username = req.user.username;
-    console.log(id, username)
     try {
         const result = await db.execute('DELETE FROM sw_posts WHERE id = ? AND username = ?', [id, username]);
-        console.log(result[0].affectedRows)
         if (result[0].affectedRows > 0) {
             res.sendStatus(200);
         } else {
@@ -152,7 +124,7 @@ app.delete(baseUrl + '/deleteTokens', async (req, res) => {
         let deletedCount = 0;
         for (const tokenData of tokens) {
             try {
-                const decodedToken = jwt.verify(tokenData.token, JWT_SECRET);
+                const decodedToken = jwt.verify(tokenData.token, TOKEN_SECRET);
                 if (decodedToken.exp <= currentTime) {
                     await db.execute('DELETE FROM sw_tokens WHERE user = ?', [tokenData.user]);
                     deletedCount++;
