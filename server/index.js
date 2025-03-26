@@ -23,6 +23,13 @@ app.use(cors({
     credentials: true
 }));
 
+const cities = [
+    "Barcelona", "Bangkok", "Baltimore", "Bari", "Baton Rouge",
+    "Aberdeen", "Abbeville", "Abruzzo", "Abensberg",
+    "Abtsgmünd", "Abenberg", "Abtenau",
+    "Aachen", "Acquaviva", "Acri", "Acquapendente", "Aci Castello",
+    "Aci Catena", "Acquanegra sul Chiese", "Accrington", "Acomb", "Acton"
+];
 
 // Middleware to check JWT token
 const authenticateToken = async (req, res, next) => {
@@ -147,6 +154,74 @@ app.delete(baseUrl + '/deleteTokens', async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+app.get(baseUrl + '/cities/:prefix', (req, res) => {
+    try {
+        const searchPrefix = req.params.prefix.toLowerCase();
+        const minLength = 2;
+        const maxLength = 20; // New: Add maximum length constraint
+        const maxResults = req.query.limit || 50; // New: Add pagination support
+
+        // Validate input
+        if (searchPrefix.length < minLength) {
+            return res.status(400).json({
+                error: `Prefix must be at least ${minLength} characters long`
+            });
+        }
+
+        if (searchPrefix.length > maxLength) {
+            return res.status(400).json({
+                error: `Prefix cannot exceed ${maxLength} characters`
+            });
+        }
+
+        // Case-insensitive search with early exit
+        const matchingCities = [];
+        for (const city of cities) {
+            if (city.toLowerCase().startsWith(searchPrefix)) {
+                matchingCities.push(city);
+                if (matchingCities.length >= maxResults) break; // Early exit when limit reached
+            }
+        }
+
+        if (matchingCities.length === 0) {
+            return res.status(404).json({
+                message: `No cities found starting with "${searchPrefix}"`,
+                suggestions: getSimilarPrefixes(searchPrefix) // New: Add suggestions
+            });
+        }
+
+        res.json({
+            prefix: searchPrefix,
+            count: matchingCities.length,
+            totalAvailable: cities.filter(c => c.toLowerCase().startsWith(searchPrefix)).length,
+            cities: matchingCities,
+            pagination: {
+                limit: maxResults,
+                hasMore: matchingCities.length < cities.filter(c => c.toLowerCase().startsWith(searchPrefix)).length
+            }
+        });
+
+    } catch (error) {
+        console.error('Error processing request:', error);
+        res.status(500).json({
+            error: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+// Helper function to suggest similar prefixes
+function getSimilarPrefixes(prefix) {
+    const prefixSet = new Set();
+    cities.forEach(city => {
+        const cityPrefix = city.toLowerCase().substring(0, prefix.length + 1);
+        if (cityPrefix.startsWith(prefix.substring(0, prefix.length - 1))) {
+            prefixSet.add(cityPrefix);
+        }
+    });
+    return Array.from(prefixSet).sort();
+}
 
 app.listen(PORT, () => {
     console.log(`API service started on port ${PORT}, API base url is ${baseUrl}`);
