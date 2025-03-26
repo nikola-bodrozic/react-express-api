@@ -24,6 +24,9 @@ const NavBar: React.FC = () => {
                 <li>
                     <Link to="/form" id="form">Form</Link>
                 </li>
+                <li>
+                    <Link to="/debounce" id="debounce">Debounce</Link>
+                </li>
             </ul>
         </nav>
     );

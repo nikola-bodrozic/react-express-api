@@ -15,6 +15,7 @@ import { AuthProvider } from "./AuthContext";
 import Logout from "./components/Logout";
 import About from "./components/About";
 import FormValidator from "./components/FormValidator/FormValidator";
+import CitySearch from "./components/CitySearch/CitySearch";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               element={<ProtectedRoute element={<Dashboard />} />}
             />
             <Route path="/form" element={<FormValidator />} />
+            <Route path="/debounce" element={<CitySearch />} />
           </Routes>
         </Router>
       </AuthProvider>

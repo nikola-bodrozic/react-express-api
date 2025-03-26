@@ -1,0 +1,43 @@
+.city-search {
+    max-width: 500px;
+    margin: 2rem auto;
+    font-family: sans-serif;
+  }
+  
+  .city-search input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .loading {
+    color: #666;
+    margin: 0.5rem 0;
+  }
+  
+  .error {
+    color: #d32f2f;
+    margin: 0.5rem 0;
+  }
+  
+  .results {
+    margin-top: 1rem;
+  }
+  
+  .results ul {
+    list-style: none;
+    padding: 0;
+    border: 1px solid #eee;
+    border-radius: 4px;
+  }
+  
+  .results li {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .results li:last-child {
+    border-bottom: none;
+  }
