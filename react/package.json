@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest",
-    "e2e": "cypress run --spec 'cypress/e2e/login-fixtures.cy.ts'",
+    "e2e": "cypress run --spec 'cypress/e2e/login-logout.cy.ts'",
     "e2e:gui": "cypress open"
   },
   "dependencies": {

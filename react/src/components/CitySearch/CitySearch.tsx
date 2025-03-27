@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
 import "./CitySearch.css";
 
@@ -55,6 +55,7 @@ const CitySearch = () => {
 
   return (
     <div className="city-search">
+      <p>Filtering city names. Try "ac" and then "aci"</p>
       <input
         type="text"
         value={prefix}
