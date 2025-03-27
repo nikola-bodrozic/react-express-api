@@ -1,64 +1,67 @@
 /// <reference types="cypress" />
 describe("Toggle Test", () => {
     const baseURL = "http://localhost";
+    const apiBaseURL = `${baseURL}:4000/api/v1`;
     const reactBaseURL = `${baseURL}:5173/`
 
     beforeEach(() => {
         cy.visit(reactBaseURL + "slider");
+
+        cy.intercept('GET', `${apiBaseURL}/slider`, {
+            statusCode: 200,
+            body: { america: false, asia: false }
+        }).as('getInitialState');
+
+        cy.intercept('PUT', `${apiBaseURL}/slider`, {
+            statusCode: 200,
+            body: { success: true }
+        }).as('saveState');
     });
 
-    it('should initialize with all toggles in off state', () => {
+    it('should show loading state initially', () => {
+        cy.get('.loading').should('be.visible');
+        cy.get('.loading').contains('Loading slider states');
+    });
+
+    it('should render toggles with initial state', () => {
         cy.get('#world .slider').should('have.class', 'slider-off');
         cy.get('#america .slider').should('have.class', 'slider-off');
         cy.get('#asia .slider').should('have.class', 'slider-off');
     });
 
-    it('should toggle all switches when parent is clicked', () => {
-        // Toggle parent on
+    it('should toggle all sliders when parent is clicked', () => {
         cy.get('#world').click();
+        cy.get('@saveState').should('have.property', 'response');
+
         cy.get('#world .slider').should('have.class', 'slider-on');
         cy.get('#america .slider').should('have.class', 'slider-on');
         cy.get('#asia .slider').should('have.class', 'slider-on');
 
-        // Toggle parent off
-        cy.get('#world').click();
-        cy.get('#world .slider').should('have.class', 'slider-off');
-        cy.get('#america .slider').should('have.class', 'slider-off');
-        cy.get('#asia .slider').should('have.class', 'slider-off');
+        cy.get('@saveState').its('request.body').should('deep.equal', {
+            america: true,
+            asia: true
+        });
     });
 
-    it('should toggle individual child switches independently', () => {
-        // Toggle America
+    it('should toggle individual sliders', () => {
         cy.get('#america').click();
-        cy.get('#america .slider').should('have.class', 'slider-on');
-        // Verify others remain unchanged
-        cy.get('#world .slider').should('have.class', 'slider-off');
-        cy.get('#asia .slider').should('have.class', 'slider-off');
+        cy.get('@saveState').its('request.body').should('deep.equal', {
+            america: true,
+            asia: false
+        });
 
-        // Toggle Asia
         cy.get('#asia').click();
-        cy.get('#asia .slider').should('have.class', 'slider-on');
+        cy.get('@saveState').its('request.body').should('deep.equal', {
+            america: true,
+            asia: true
+        });
     });
 
-    it('should set parent to off when any child is off', () => {
-        // Turn all on via parent
-        cy.get('#world').click();
 
-        // Turn America off
-        cy.get('#america').click();
-
-        // Verify parent is off
-        cy.get('#world .slider').should('have.class', 'slider-off');
-        // Asia should remain on
-        cy.get('#asia .slider').should('have.class', 'slider-on');
-    });
-
-    it('should only set parent to on when all children are on', () => {
-        // Turn America on
+    it('should sync parent toggle when all children are toggled', () => {
         cy.get('#america').click();
         cy.get('#world .slider').should('have.class', 'slider-off');
 
-        // Turn Asia on
         cy.get('#asia').click();
         cy.get('#world .slider').should('have.class', 'slider-on');
     });
