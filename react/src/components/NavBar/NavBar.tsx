@@ -27,6 +27,9 @@ const NavBar: React.FC = () => {
                 <li>
                     <Link to="/debounce" id="debounce">Debounce</Link>
                 </li>
+                <li>
+                    <Link to="/slider" id="SliderToggle">Switch</Link>
+                </li>
             </ul>
         </nav>
     );

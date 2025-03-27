@@ -16,6 +16,7 @@ import Logout from "./components/Logout";
 import About from "./components/About";
 import FormValidator from "./components/FormValidator/FormValidator";
 import CitySearch from "./components/CitySearch/CitySearch";
+import SliderToggle from "./components/SliderToggle/SliderToggle";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             />
             <Route path="/form" element={<FormValidator />} />
             <Route path="/debounce" element={<CitySearch />} />
+            <Route path="/slider" element={<SliderToggle />} />
           </Routes>
         </Router>
       </AuthProvider>

@@ -24,8 +24,6 @@ describe("Login Test", () => {
       statusCode: 200,
       body: { message: 'Logout successful' }
     }).as('logout');
-    // Cypress.env('login_url')
-    
 
     cy.get("#dashboard").click();
     cy.url().should("include", "/login");
