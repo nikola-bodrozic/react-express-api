@@ -32,7 +32,7 @@ const SliderToggle = () => {
     <div className='padding'>
       {/* World News Slider */}
       <div className="toggle-row">
-        <div className="slider-container" onClick={handleWorldNewsToggle}>
+        <div id="world" className="slider-container" onClick={handleWorldNewsToggle}>
           <div
             className={`slider ${worldNewsToggle ? 'slider-on' : 'slider-off'}`}
           >
@@ -45,6 +45,7 @@ const SliderToggle = () => {
       {/* Child Sliders */}
       <div className="toggle-row child-row">
         <div
+          id="america"
           className="slider-container"
           onClick={() => handleChildToggle('america')}
         >
@@ -60,6 +61,7 @@ const SliderToggle = () => {
 
       <div className="toggle-row child-row">
         <div
+          id="asia"
           className="slider-container"
           onClick={() => handleChildToggle('asia')}
         >
