@@ -18,7 +18,7 @@ console.log("environment:", process.env.NODE_ENV);
 
 app.use(cors({
     origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'OPTIONS', 'DELETE'],
+    methods: ['GET', 'POST', 'OPTIONS', 'DELETE', 'PUT'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     credentials: true
 }));
@@ -222,6 +222,28 @@ function getSimilarPrefixes(prefix) {
     });
     return Array.from(prefixSet).sort();
 }
+
+app.get(baseUrl + '/slider', async (req, res) => {
+    try {
+        const [rows] = await db.execute('SELECT america, asia FROM sw_slider WHERE id=1');
+        res.json(rows[0] || { america: false, asia: false });
+    } catch (err) {
+        console.error('GET /slider error:', err);
+        res.status(500).json({ error: 'Failed to fetch slider state' });
+    }
+});
+
+app.put(baseUrl + '/slider', async (req, res) => {
+    const { america, asia } = req.body;
+
+    try {
+        await db.execute(`UPDATE sw_slider SET america = ?, asia = ?, updated_at = NOW() WHERE id = 1;`,[america, asia]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('PUT /slider error:', err);
+        res.status(500).json({ error: 'Failed to update slider state' });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`API service started on port ${PORT}, API base url is ${baseUrl}`);
