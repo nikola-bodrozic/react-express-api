@@ -242,7 +242,7 @@ app.put(baseUrl + '/slider', async (req, res) => {
     const { america, asia } = req.body;
 
     try {
-        await db.execute(`UPDATE sw_slider SET america = ?, asia = ?, updated_at = NOW() WHERE id = 1;`,[america, asia]);
+        await db.execute(`UPDATE sw_slider SET america = ?, asia = ? WHERE id = 1;`,[america, asia]);
         res.json({ success: true });
     } catch (err) {
         console.error('PUT /slider error:', err);
