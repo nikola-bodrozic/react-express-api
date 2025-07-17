@@ -7,21 +7,22 @@ Features:
 - stateless app using JWT access token
 - Protected routes on Express and React
 - Cypress E2E tests
-- Form validation using computed prop name in `FormValidator.tsx`
+- Form validation combined with captcha in `CAPTCHAFormValidator.tsx`
 
 
 ## Prepare
 
 In `server/` folder rename `.env.sample` to `.env` file  and set values for env. variables.
+In `react/` folder rename `.env.sample` to `.env` file  and set values for env. variables.
 
 Create tables in database
 
 ```SQL
 CREATE TABLE IF NOT EXISTS sw_users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `username` VARCHAR(255) NOT NULL UNIQUE,
+    `password` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS sw_tokens (
@@ -43,14 +44,14 @@ CREATE TABLE IF NOT EXISTS `sw_posts` (
   CONSTRAINT `sw_posts_ibfk_1` FOREIGN KEY (`username`) REFERENCES `sw_users` (`username`)
 );
 
--- populate sw_users with test users, set password using bcrypt         
--- const hashedPassword = await bcrypt.hash(password, 10);
+INSERT INTO `sw_users` (`id`, `username`, `password`, `created_at`) VALUES (1, 'testuser', '$2a$10$byNQLVU8Aj2t598.iSUn5uYRGySkT6Q4iAgySfeJBrEJAGDcrRj5W', '2025-03-26 00:12:00');
+INSERT INTO `sw_users` (`id`, `username`, `password`, `created_at`) VALUES (2, 'testmike', '$2a$10$byNQLVU8Aj2t598.iSUn5uYRGySkT6Q4iAgySfeJBrEJAGDcrRj5W', '2025-03-26 00:16:11');
+```
 
-INSERT INTO `sw_users` (`id`, `username`, `hashedPassword`, `created_at`) VALUES (1, 'testuser', '', '2025-03-26 00:12:00');
-INSERT INTO `sw_users` (`id`, `username`, `hashedPassword`, `created_at`) VALUES (2, 'testmike', '', '2025-03-26 00:16:11');
+password for both users are testpass
+populate sw_posts with dummy data
 
--- populate sw_posts with dummy data
-
+```sql
 INSERT INTO sw_posts (id, title, content, created_at, username) 
 VALUES (
   1, 
@@ -81,8 +82,8 @@ VALUES (
 
 ### Deployment in Local Environment
 
-In `react/` folders install dependancies with `yarn` and start the React app with `yarn dev`.
-Install dependencies in `server/` folder with `yarn` and use `yarn dev` to start the API server.
+In `react/` folder install dependancies with `yarn` and start the React app with `yarn dev`.
+in `server/` folder install dependancies with `yarn` and start the React app with `yarn dev`.
 
 ### Running Cypress tests
 

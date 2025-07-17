@@ -3,7 +3,6 @@ import "./Login.css";
 import { useAuth } from "../../AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "../../axiosConfig";
-import { toast } from "react-toastify";
 import Loader from "react-js-loader";
 
 const Login = () => {
@@ -18,27 +17,39 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage([]); // Clear previous errors
+    
     try {
-      const res = await axios.post(
-        "/login",
-        {
-          username,
-          password
-        }
-      );
-      renderName(res.data.username);
+      const res = await axios.post("/login", { username, password });
       localStorage.setItem('jwtToken', res.data.token);
+      renderName(res.data.username);
       login();
-      toast.success("Logged in successfully!");
-      setIsLoading(false);
+
       navigate("/dashboard");
+      
     } catch (error: unknown) {
-      setIsLoading(false);
       if (axios.isAxiosError(error)) {
-        error.response && setErrorMessage(error.response.data.errors);
+        if (error.response) {
+          console.log(error.response)
+          // Backend returned an error response (4xx, 5xx)
+          const message = error.response.data.error || 
+                         error.response.data.message || 
+                         'Invalid credentials';
+          setErrorMessage([message]);
+        } else if (error.request) {
+          // Request was made but no response received
+          setErrorMessage(['Network error - please try again']);
+        } else {
+          // Something happened in setting up the request
+          setErrorMessage(['Login failed - please try again']);
+        }
       } else {
+        // Non-Axios error
         setErrorMessage(['An unexpected error occurred']);
+        console.error('Non-Axios error:', error);
       }
+    } finally {
+      setIsLoading(false); // Ensure loading state is always reset
     }
   };
 
@@ -57,9 +68,9 @@ const Login = () => {
     <>
       <div id="error">
         {errorMessage.length > 0 &&
-          errorMessage.map((el: any, index: number) => (
+          errorMessage.map((el: string, index: number) => (
             <div key={index} className="err-item">
-              {el.msg}
+              {el}
             </div>
           ))}
       </div>
