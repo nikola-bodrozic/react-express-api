@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios')
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -12,6 +13,8 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
 const TOKEN_EXPIRY = process.env.TOKEN_EXPIRY;
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+
 app.use(express.json());
 
 console.log("environment:", process.env.NODE_ENV);
@@ -243,6 +246,100 @@ app.put(baseUrl + '/slider', async (req, res) => {
         console.error('PUT /slider error:', err);
         res.status(500).json({ error: 'Failed to update slider state' });
     }
+});
+
+const getClientIp = (req) => {
+  // 1. Check for 'x-forwarded-for' header (common with proxies like Nginx)
+  const forwardedFor = req.headers["x-forwarded-for"];
+
+  // 2. If header exists, take the first IP (comma-separated list)
+  if (forwardedFor) {
+    return typeof forwardedFor === "string"
+      ? forwardedFor.split(",")[0].trim()
+      : forwardedFor[0].trim();
+  }
+
+  // 3. Fallback to Express's req.ip
+  if (req.ip) return req.ip;
+
+  // 4. Final fallback to legacy connection remoteAddress
+  return req.connection?.remoteAddress || "unknown";
+};
+
+app.post(baseUrl + "/verify", async (req, res) => {
+  console.log(req.body);
+  const { email, recaptchaToken } = req.body;
+  const userIp = req.ip || req.connection.remoteAddress; // Get user's IP
+
+  console.log("Received form submission:");
+  console.log("email:", email);
+  console.log("reCAPTCHA Token:", recaptchaToken);
+  console.log("User IP:", userIp);
+
+  if (!recaptchaToken) {
+    return res
+      .status(400)
+      .json({ success: false, error: "reCAPTCHA token is missing." });
+  }
+
+  // 2. Verify reCAPTCHA token with Google
+  try {
+    const userIp = getClientIp(req);
+    const googleResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null, // No data in the request body, send as URL parameters
+      {
+        params: {
+          secret: RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken,
+          remoteip: userIp,
+        },
+      }
+    );
+
+    const { success, "error-codes": errorCodes } = googleResponse.data;
+
+    if (success) {
+      console.log(`Successfully validated and received: email=${email}`);
+      return res
+        .status(200)
+        .json({
+          success: true,
+          message: "Form submitted and reCAPTCHA verified!",
+        });
+    } else {
+      console.error("reCAPTCHA Verification Failed. Error codes:", errorCodes);
+      return res.status(403).json({
+        success: false,
+        error: "reCAPTCHA verification failed. Are you a robot?",
+        details: errorCodes || ["unknown_error"],
+      });
+    }
+  } catch (error) {
+    console.error(
+      "Error during reCAPTCHA verification or backend processing:",
+      error.message
+    );
+    if (error.response) {
+      console.error(
+        "Google reCAPTCHA API error response:",
+        error.response.data
+      );
+      return res
+        .status(500)
+        .json({
+          success: false,
+          error: "Failed to verify reCAPTCHA with Google.",
+          details: error.response.data,
+        });
+    }
+    return res
+      .status(500)
+      .json({
+        success: false,
+        error: "Internal server error during form submission.",
+      });
+  }
 });
 
 app.listen(PORT, () => {

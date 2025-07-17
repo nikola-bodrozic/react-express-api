@@ -12,9 +12,9 @@ const NavBar: React.FC = () => {
                 <li>
                     <Link to="/" id="home">Home</Link>
                 </li>
-                <li>
+                {/* <li>
                     <Link to="/about" id="about">About</Link>
-                </li>
+                </li> */}
                 <li>
                     {isAuthenticated ? (<><span id="name-holder">Hello {name}</span> <Link to="/logout" id="logout">Logout</Link></>) : (<Link to="/login" id="login">Login</Link>)}
                 </li>

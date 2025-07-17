@@ -1,102 +1,104 @@
-import React, { useState } from 'react';
-import styles from './FormValidator.module.css';
-const FormValidator = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    password: '',
-  });
+import React, { useRef, useState, useEffect, ForwardRefExoticComponent, RefAttributes } from 'react';
 
-  const [valid, setValid] = useState({
-    name: false,
-    password: false,
-  });
+import ReCAPTCHA from 'react-google-recaptcha';
+import axios from 'axios';
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // computed property names
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+// Cast ReCAPTCHA to the proper type via 'unknown'
+const SafeReCAPTCHA = ReCAPTCHA as unknown as ForwardRefExoticComponent<
+Omit<ReCAPTCHAProps, 'ref'> & RefAttributes<ReCAPTCHA>
+>;
+
+interface ReCAPTCHAProps {
+  sitekey: string;
+  size?: 'invisible' | 'normal' | 'compact';
+  badge?: 'bottomright' | 'bottomleft' | 'inline';
+  onChange?: (token: string | null) => void;
+  onErrored?: () => void;
+  onExpired?: () => void;
+}
+
+const FormValidator: React.FC = () => {
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [email, setEmail] = useState('');
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  useEffect(() => {
+    const refreshTimer = setTimeout(async () => {
+      if (!hasSubmitted && recaptchaRef.current) {
+        await recaptchaRef.current.reset();
+        const recaptchaToken = await recaptchaRef.current.executeAsync();
+        if (recaptchaToken) {
+          hashToken(recaptchaToken).then((hash) => {
+            console.log('🔄 Refreshed token hash:', hash);
+          });
+        }
+      }
+    }, 1000 * 115);
+
+    return () => clearTimeout(refreshTimer);
+  }, [hasSubmitted]);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const hashToken = async (recaptchaToken: string): Promise<string> => {
+    const utf8 = new TextEncoder().encode(recaptchaToken);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let error = ""
-    Object.entries(valid).forEach(([key, value]) => {
-      if (value === true) error += "\n not valid field: " + key
+
+    const recaptchaToken = await recaptchaRef.current?.executeAsync();
+    recaptchaRef.current?.reset();
+
+    if (!recaptchaToken) {
+      console.warn('⚠️ CAPTCHA token unavailable');
+      alert('CAPTCHA failed. Try again.');
+      return;
+    }
+
+    hashToken(recaptchaToken).then((hash) => {
+      console.log('🔒 Submitted token hash:', hash);
     });
-    if (error != "") alert(error);
-    else
-      alert(JSON.stringify(formData));
+
+    try {
+      const response = await axios.post('/verify', { recaptchaToken, email });
+
+      if (response.data.success === true) {
+        setHasSubmitted(true);
+        alert('✅ Email verified!');
+        console.log('Verification passed.');
+      } else {
+        alert('❌ Verification failed.');
+        console.warn('reCAPTCHA error codes:', response.data['error-codes']);
+      }
+    } catch (error) {
+      console.error('🚨 Server error:', error);
+      alert('Something went wrong.');
+    }
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (value.length < 2) {
-      setValid({ ...valid, [name]: true });
-    }
-    if (value.length >= 2) {
-      setValid({ ...valid, [name]: false });
-    }
-  }
-  /*
-    const handleBlur = (e) => {
-      const { name, value } = e.target;
-      console.log(name, value ,value.length)
-      if (value.length < 2 && name === "name") {
-        setValid({ ...valid, name: true });
-      } 
-          if (value.length >= 2 && name === "name") {
-        setValid({ ...valid, name: false });
-      } 
-          if (value.length >= 2 && name === "password"){
-        console.log(name, value, value.length)
-        setValid({ ...valid, password: false });
-      }
-      if (value.length < 2 && name === "password"){
-        console.log(name, value, value.length)
-        setValid({ ...valid, password: true });
-      }
-    };
-  */
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label
-          id="lname"
-          className={valid.name ? styles.errorLabel : ''}
-          htmlFor="name"
-        >
-          Name:
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          className={valid.name ? styles.errorInput : ''}
-          value={formData.name}
-          onChange={handleChange}
-          onBlur={handleBlur}
-        />
-        <span className={valid.name ? styles.errorLabel : ''}>{valid.name && " min. 2 chars"}</span>
-      </div>
-      <div>
-        <label className={valid.password ? styles.errorLabel : ''} htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={formData.password}
-          className={valid.password ? styles.errorInput : ''}
-          onChange={handleChange}
-          onBlur={handleBlur}
-        />
-        <span className={valid.password ? styles.errorLabel : ''}>{valid.password && " min. 2 chars"}</span>
-      </div>
-      <button type="submit">
-        <span>Show alert</span>
-      </button>
+      <input
+        type="email"
+        value={email}
+        onChange={handleEmailChange}
+        placeholder="Your email"
+        required
+      />
+      <SafeReCAPTCHA
+        ref={recaptchaRef}
+        sitekey={import.meta.env.VITE_APP_CAPTCHA_PUBLIC}
+        size="invisible"
+        badge="inline"
+      />
+      <button type="submit">Submit</button>
     </form>
   );
 };

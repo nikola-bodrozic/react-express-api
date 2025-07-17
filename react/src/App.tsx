@@ -13,7 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard/Dashboard";
 import { AuthProvider } from "./AuthContext";
 import Logout from "./components/Logout";
-import About from "./components/About";
+// import About from "./components/About";
 import FormValidator from "./components/FormValidator/FormValidator";
 import CitySearch from "./components/CitySearch/CitySearch";
 import SliderToggle from "./components/SliderToggle/SliderToggle";
@@ -26,7 +26,7 @@ function App() {
           <NavBar />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
+            {/* <Route path="/about" element={<About />} /> */}
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route
