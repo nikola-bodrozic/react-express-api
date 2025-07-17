@@ -53,21 +53,16 @@
       "user": { "id": 1, "name": "Name 1", "username": "testuser" }
     }
   },
-  "shortCreds":{
-    "errors": [
-      {
-        "msg": "test Username must be at least 5 characters long"
-      },
-      {
-        "msg": "test Password must be at least 5 characters long"
-      }
-    ]
-  },
   "badCreds":{
-    "errors": [
-      {
-        "msg": "test bad username/password"
-      }
-    ]
+    "statusCode": 403,
+    "body": {
+       "error":"mock bad username or password"
+    }
+  },
+  "badCreds2":{
+    "statusCode": 403,
+    "body": {
+      "error":"bad username or password"
+    }
   }
 }

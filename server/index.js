@@ -61,12 +61,15 @@ const authenticateToken = async (req, res, next) => {
 // Route to login and get JWT token
 app.post(baseUrl + '/login', async (req, res) => {
     const { username, password } = req.body;
+    if (!password || password.length < 4) {
+        return res.status(400).json({ error: 'Password must be at least 4 characters' });
+    }
     try {
         const [users] = await db.execute('SELECT * FROM sw_users WHERE username = ?', [username]);
         const user = users[0];
         console.log(user, password)
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(403).json({ error: 'bad username/password' });
+            return res.status(403).json({ error: 'bad username or password' });
         }
         const token = jwt.sign({ username }, TOKEN_SECRET, { expiresIn: TOKEN_EXPIRY });
         const query = 'INSERT INTO sw_tokens (token, user) VALUES (?, ?)';
