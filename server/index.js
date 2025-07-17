@@ -1,5 +1,6 @@
 const express = require('express');
-const axios = require('axios')
+const axios = require('axios');
+const validator = require('validator');
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -267,13 +268,14 @@ const getClientIp = (req) => {
 };
 
 app.post(baseUrl + "/verify", async (req, res) => {
-  console.log(req.body);
   const { email, recaptchaToken } = req.body;
   const userIp = req.ip || req.connection.remoteAddress; // Get user's IP
-
+  if (!validator.isEmail(req.body.email)) {
+    return res.status(400).json({ success: false, error: 'Invalid email format' });
+  }
   console.log("Received form submission:");
   console.log("email:", email);
-  console.log("reCAPTCHA Token:", recaptchaToken);
+  console.log("reCAPTCHA Token:", recaptchaToken.slice(-20));
   console.log("User IP:", userIp);
 
   if (!recaptchaToken) {
