@@ -14,7 +14,7 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import { AuthProvider } from "./AuthContext";
 import Logout from "./components/Logout";
 // import About from "./components/About";
-import FormValidator from "./components/FormValidator/FormValidator";
+import CAPTCHAFormValidator from "./components/CAPTCHAFormValidator/CAPTCHAFormValidator";
 import CitySearch from "./components/CitySearch/CitySearch";
 import SliderToggle from "./components/SliderToggle/SliderToggle";
 
@@ -33,7 +33,7 @@ function App() {
               path="/dashboard"
               element={<ProtectedRoute element={<Dashboard />} />}
             />
-            <Route path="/form" element={<FormValidator />} />
+            <Route path="/form" element={<CAPTCHAFormValidator />} />
             <Route path="/debounce" element={<CitySearch />} />
             <Route path="/slider" element={<SliderToggle />} />
           </Routes>

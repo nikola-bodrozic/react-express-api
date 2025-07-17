@@ -17,7 +17,7 @@ interface ReCAPTCHAProps {
   onExpired?: () => void;
 }
 
-const FormValidator: React.FC = () => {
+const CAPTCHAFormValidator: React.FC = () => {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [email, setEmail] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -85,6 +85,7 @@ const FormValidator: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <p>Google reCAPTCHA v2 invisible</p>
       <input
         type="email"
         value={email}
@@ -103,4 +104,4 @@ const FormValidator: React.FC = () => {
   );
 };
 
-export default FormValidator;
+export default CAPTCHAFormValidator;

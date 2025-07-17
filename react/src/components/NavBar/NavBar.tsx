@@ -22,7 +22,7 @@ const NavBar: React.FC = () => {
                     <Link to="/dashboard" id="dashboard">Dashboard</Link>
                 </li>
                 <li>
-                    <Link to="/form" id="form">Form</Link>
+                    <Link to="/form" id="form">CAPTCHA</Link>
                 </li>
                 <li>
                     <Link to="/debounce" id="debounce">Debounce</Link>
