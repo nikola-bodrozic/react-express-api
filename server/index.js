@@ -7,8 +7,7 @@ const bcrypt = require('bcryptjs');
 const { pd1, pd2 } = require("./constants");
 require('dotenv').config();
 const db = require('./db');
-const { validateLogin } = require("./utils");
-const { body, validationResult } = require('express-validator');
+const md5 = require('md5');
 const baseUrl = "/api/v1";
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -344,6 +343,32 @@ app.post(baseUrl + "/verify", async (req, res) => {
       });
   }
 });
+
+app.get('/get-joke', async (req, res) => {
+    try {
+      const response = await axios.get('https://api.chucknorris.io/jokes/random');
+      const joke = response.data.value;
+      const checksum = md5(joke)
+  
+      // Check if checksum already exists
+      const [rows] = await db.query('SELECT id FROM sw_jokes WHERE checksum = ?', [checksum]);
+  
+      if (rows.length > 0) {
+        return res.send(`Joke already exists with MD5: ${checksum}`);
+      }
+  
+      // Insert new joke
+      const [result] = await db.query(
+        'INSERT INTO sw_jokes (text, checksum) VALUES (?, ?)',
+        [joke, checksum]
+      );
+      console.log(result.insertId)
+      res.send(`New joke saved with MD5: ${checksum}`);
+    } catch (error) {
+      console.error('Oops:', error);
+      res.status(500).send("Couldn't retrieve or store the joke. Chuck might’ve crashed the checksum server.");
+    }
+  });
 
 // Only start the server if this file is run directly (not required as a module)
 if (require.main === module) {

@@ -3,10 +3,10 @@
 Express API server, React TypeScript & MySQL
  
 Features:
-- HTTPS connection using self-signed certificates
 - stateless app using JWT access token
 - Protected routes on Express and React
 - Cypress E2E tests
+- Backend testing in `server/__tests__/server.test.js` and `server/__tests__/login.test.js`
 - Form validation combined with captcha in `CAPTCHAFormValidator.tsx`
 
 
@@ -95,7 +95,7 @@ in `server/` folder install dependancies with `yarn` and start the React app wit
 
 ### Running backend tests
 
-to mock db module in **/api/v1/login** route run in `server/` 
+run in `server/` 
 
 ```sh
 yarn test
