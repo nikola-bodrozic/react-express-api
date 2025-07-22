@@ -6,11 +6,12 @@ const axios = require('axios');
 jest.mock('../db');
 jest.mock('axios');
 
-beforeEach(() => {
-  jest.clearAllMocks(); // resets mock call history and implementations
-});
-
 describe('GET /get-joke', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks(); // resets mock call history and implementations
+  });
+
   test('should trigger "Joke already exists" message and match DB checksum', async () => {
     const jokeTextAPI = "mocked joke text";
 
