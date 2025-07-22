@@ -345,6 +345,12 @@ app.post(baseUrl + "/verify", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-    console.log(`API service started on port ${PORT}, API base url is ${baseUrl}`);
-});
+// Only start the server if this file is run directly (not required as a module)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`API service started on port ${PORT}, API base url is ${baseUrl}`);
+    });
+}
+
+module.exports = app;
+

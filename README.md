@@ -52,8 +52,8 @@ CREATE TABLE sw_slider (
 
 INSERT INTO sw_slider(id, america, asia) VALUES (1, FALSE, FALSE)
 
-INSERT INTO `sw_users` (`id`, `username`, `password`, `created_at`) VALUES (1, 'testuser', '$2a$10$byNQLVU8Aj2t598.iSUn5uYRGySkT6Q4iAgySfeJBrEJAGDcrRj5W', '2025-03-26 00:12:00');
-INSERT INTO `sw_users` (`id`, `username`, `password`, `created_at`) VALUES (2, 'testmike', '$2a$10$byNQLVU8Aj2t598.iSUn5uYRGySkT6Q4iAgySfeJBrEJAGDcrRj5W', '2025-03-26 00:16:11');
+INSERT INTO `sw_users` (`id`, `username`, `password`, `created_at`) VALUES (1, 'testuser', '$2a$10$uLzqXAuSsQfa7MWZm2cjGuht5s4VZYWf3McG4P26geyvkIgds8xJu', '2025-03-26 00:12:00');
+INSERT INTO `sw_users` (`id`, `username`, `password`, `created_at`) VALUES (2, 'testmike', '$2a$10$uLzqXAuSsQfa7MWZm2cjGuht5s4VZYWf3McG4P26geyvkIgds8xJu', '2025-03-26 00:16:11');
 ```
 
 password for both users are `testpass`
@@ -92,6 +92,14 @@ VALUES (
 
 In `react/` folder install dependancies with `yarn` and start the React app with `yarn dev`.
 in `server/` folder install dependancies with `yarn` and start the React app with `yarn dev`.
+
+### Running backend tests
+
+to mock db module in **/api/v1/login** route run in `server/` 
+
+```sh
+yarn test
+```
 
 ### Running Cypress tests
 
