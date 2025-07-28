@@ -4,6 +4,7 @@ const validator = require('validator');
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const xss = require('xss-clean');
 const { pd1, pd2 } = require("./constants");
 require('dotenv').config();
 const db = require('./db');
@@ -16,6 +17,7 @@ const TOKEN_EXPIRY = process.env.TOKEN_EXPIRY;
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 app.use(express.json());
+app.use(xss());
 
 console.log("environment:", process.env.NODE_ENV);
 
