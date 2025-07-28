@@ -370,7 +370,7 @@ app.get('/get-joke', async (req, res) => {
       console.error('Oops:', error);
       res.status(500).send("Couldn't retrieve or store the joke. Chuck might’ve crashed the checksum server.");
     }
-  });
+});
 
 // Only start the server if this file is run directly (not required as a module)
 if (require.main === module) {
