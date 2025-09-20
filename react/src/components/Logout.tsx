@@ -9,29 +9,21 @@ const Logout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getData = async () => {
-      const token = localStorage.getItem('jwtToken');
-
+    const performLogout = async () => {
       try {
-        const res = await axios.post("/logout", {}, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        toast.success(res.data);
-        localStorage.removeItem('jwtToken');
+        await axios.post("/logout", {});
         logout();
         navigate('/');
       } catch (error) {
-        console.error('Request failed:', error);
-        // Handle error response (you can use toast or any other notification here)
+        console.error('Logout failed:', error);
         toast.error('Failed to log out');
       }
-    }
-    getData();
+    };
+
+    performLogout();
   }, [logout, navigate]);
 
-  return null
+  return null;
 };
 
 export default Logout;

@@ -1,76 +1,70 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import axios from './axiosConfig';
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
-  renderName: (name: string) => void;
-  name: string | null;
+    isAuthenticated: boolean;
+    login: () => void;
+    logout: () => void;
+    renderName: (name: string) => void;
+    name: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Try to get initial state from localStorage
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    const savedToken = localStorage.getItem('jwtToken');
-    return !!savedToken; // If token exists, assume authenticated
-  });
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [name, setName] = useState<string | null>(null);
 
-  const [name, setName] = useState<string | null>(() => {
-    return localStorage.getItem('userName') || null;
-  });
+    // Check authentication status on mount
+    useEffect(() => {
+        const checkAuth = async () => {
+            axios.get('/me')
+                .then(res => {
+                    setIsAuthenticated(true);
+                    setName(res.data.username);
+                })
+                .catch(() => {
+                    setIsAuthenticated(false);
+                    setName(null);
+                });
+        };
+        checkAuth();
+    }, []);
 
-  // Login: save token and set state
-  const login = () => {
-    // Assume token was saved in localStorage elsewhere
-    setIsAuthenticated(true);
-    // Optionally ensure name is also persisted
-    const savedName = localStorage.getItem('userName');
-    if (savedName) setName(savedName);
-  };
-
-  // Logout: clear everything
-  const logout = () => {
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('userName');
-    setIsAuthenticated(false);
-    setName(null);
-  };
-
-  // Update name and persist it
-  const renderName = (userName: string) => {
-    setName(userName);
-    localStorage.setItem('userName', userName);
-  };
-
-  // Optional: Sync auth state if token is added/removed outside this context
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const token = localStorage.getItem('jwtToken');
-      setIsAuthenticated(!!token);
-      const userName = localStorage.getItem('userName');
-      setName(userName);
+    const login = () => {
+        // After successful login, re-check auth status
+        setIsAuthenticated(true);
+        // Optionally re-fetch user info
+        axios.get('/me')
+            .then((res: any) => setName(res.data.username))
+            .catch(() => setName(null));
     };
 
-    window.addEventListener('storage', handleStorageChange); // Listen for changes in other tabs
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
+    const logout = async () => {
+        try {
+            await axios.post('/logout', {});
+        } catch (err) {
+            console.error('Logout failed:', err);
+        }
+        setIsAuthenticated(false);
+        setName(null);
     };
-  }, []);
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, renderName, name }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    const renderName = (userName: string) => {
+        setName(userName);
+    };
+
+    return (
+        <AuthContext.Provider value={{ isAuthenticated, login, logout, renderName, name }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };

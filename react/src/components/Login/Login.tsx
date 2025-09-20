@@ -17,62 +17,47 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage([]); // Clear previous errors
-    
+    setErrorMessage([]);
+
     try {
       const res = await axios.post("/login", { username, password });
-      localStorage.setItem('jwtToken', res.data.token);
+
+      // Assuming backend returns { username: '...' }
       renderName(res.data.username);
       login();
-
       navigate("/dashboard");
-      
+
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          console.log(error.response)
-          // Backend returned an error response (4xx, 5xx)
           const message = error.response.data.error || 
-                         error.response.data.message || 
-                         'Invalid credentials';
+                          error.response.data.message || 
+                          'Invalid credentials';
           setErrorMessage([message]);
         } else if (error.request) {
-          // Request was made but no response received
           setErrorMessage(['Network error - please try again']);
         } else {
-          // Something happened in setting up the request
           setErrorMessage(['Login failed - please try again']);
         }
       } else {
-        // Non-Axios error
         setErrorMessage(['An unexpected error occurred']);
         console.error('Non-Axios error:', error);
       }
     } finally {
-      setIsLoading(false); // Ensure loading state is always reset
+      setIsLoading(false);
     }
   };
 
   return isLoading ? (
-    <div>
-      <div className="loaderHolder" id="loader">
-        <Loader
-          type="spinner-circle"
-          bgColor={"green"}
-          color={"red"}
-          size={150}
-        />
-      </div>
+    <div className="loaderHolder" id="loader">
+      <Loader type="spinner-circle" bgColor="green" color="red" size={150} />
     </div>
   ) : (
     <>
       <div id="error">
-        {errorMessage.length > 0 &&
-          errorMessage.map((el: string, index: number) => (
-            <div key={index} className="err-item">
-              {el}
-            </div>
-          ))}
+        {errorMessage.map((el, index) => (
+          <div key={index} className="err-item">{el}</div>
+        ))}
       </div>
 
       <h2>Login</h2>

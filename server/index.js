@@ -4,6 +4,7 @@ const validator = require('validator');
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const cookieParser = require('cookie-parser');
 const xss = require('xss-clean');
 const { pd1, pd2 } = require("./constants");
 require('dotenv').config();
@@ -16,6 +17,7 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET;
 const TOKEN_EXPIRY = process.env.TOKEN_EXPIRY;
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(xss());
 
@@ -39,8 +41,7 @@ const cities = [
 // Middleware to check JWT token
 const authenticateToken = async (req, res, next) => {
     try {
-        const authHeader = req.header('Authorization');
-        const token = authHeader && authHeader.split(' ')[1];
+        const token = req.cookies.token;
         if (!token) return res.sendStatus(401);
 
         const [rows] = await db.execute('SELECT * FROM sw_tokens WHERE token = ? AND is_invalidated = 0', [token]);
@@ -58,27 +59,49 @@ const authenticateToken = async (req, res, next) => {
         res.sendStatus(500);
     }
 };
+app.get(baseUrl + '/me', authenticateToken, (req, res) => {
+  res.send({ username: req.user.username });
+});
 
 // Route to login and get JWT token
 app.post(baseUrl + '/login', async (req, res) => {
     const { username, password } = req.body;
+    
+    // Input validation
     if (!password || password.length < 4) {
         return res.status(400).json({ error: 'Password must be at least 4 characters' });
     }
+    
     try {
+        // Validate user credentials
         const [users] = await db.execute('SELECT * FROM sw_users WHERE username = ?', [username]);
         const user = users[0];
-        console.log(user, password)
+        
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(403).json({ error: 'bad username or password' });
         }
+        
+        // Generate JWT token
         const token = jwt.sign({ username }, TOKEN_SECRET, { expiresIn: TOKEN_EXPIRY });
+        
+        // Store token in database (your approach)
         const query = 'INSERT INTO sw_tokens (token, user) VALUES (?, ?)';
         await db.execute(query, [token, username]);
-        res.json({ token, username });
+        
+        // Set HttpOnly cookie with environment-aware security
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            maxAge: 1800000
+        });
+        
+        // Send response
+        res.json({ message: 'Logged in successfully', username });
+        
     } catch (err) {
         console.error(err);
-        res.sendStatus(500);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -119,16 +142,23 @@ app.delete(baseUrl + '/posts/:id', authenticateToken, async (req, res) => {
 });
 
 app.post(baseUrl + '/logout', authenticateToken, async (req, res) => {
-    try {
-        const token = req.token;
-        const query = 'UPDATE sw_tokens SET is_invalidated = 1 WHERE token = ?';
-        await db.execute(query, [token]);
-        res.send('Logged out successfully');
-    } catch (err) {
-        console.error(err);
-        res.sendStatus(500);
-    }
+  try {
+    console.log(req.cookies)
+    const token = req.cookies.token;
+    if (!token) return res.sendStatus(400);
+
+    res.clearCookie('token');
+
+    const query = 'UPDATE sw_tokens SET is_invalidated = 1 WHERE token = ?';
+    await db.execute(query, [token]);
+
+    res.send({ message: 'Logged out successfully' });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 });
+
 
 app.delete(baseUrl + '/deleteTokens', async (req, res) => {
     try {
